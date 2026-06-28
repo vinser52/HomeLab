@@ -1,0 +1,12 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_IMAGE_TAG:-v1.13.2}
+    container_name: homepage
+    restart: unless-stopped
+    expose:
+      # Homepage serves HTTP on port 3000 inside the container.
+      - "3000"
+    volumes:
+      - ./config:/app/config
+    networks:
+      - proxy

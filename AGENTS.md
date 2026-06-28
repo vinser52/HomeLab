@@ -28,6 +28,7 @@ Networking:
 
 Current applications:
 
+- Homepage
 - OpenSpeedTest
 
 ## Project Philosophy
@@ -56,21 +57,17 @@ Performance optimizations should never unnecessarily increase architectural comp
 
 ## Architecture Principles
 
-The repository is organized by responsibility:
-
-```text
-infrastructure/
-applications/
-docs/
-```
-
-Infrastructure services live in `infrastructure/`.
-
-Applications live in `applications/`.
-
-Documentation lives in `docs/`.
+The repository is organized by responsibility: infrastructure services live in `infrastructure/`, applications live in `applications/`, and documentation lives in `docs/`.
 
 Every architectural decision should reinforce this separation. Platform services should not be mixed with user-facing applications, and application-specific concerns should not leak into shared infrastructure unless there is a clear architectural reason.
+
+## Infrastructure vs Applications
+
+Infrastructure provides shared platform capabilities. Examples include Technitium and Caddy.
+
+Applications provide user-facing functionality. Examples include Homepage, OpenSpeedTest, Jellyfin, Immich, and Paperless.
+
+Keep this boundary clear. Infrastructure should make applications easier to run; applications should not redefine the platform.
 
 ## Contracts vs Implementations
 
@@ -93,6 +90,15 @@ Prefer documenting and preserving the contract first. Treat implementations as r
 
 Caddy proxies HTTP traffic. It does not proxy DNS protocol traffic.
 
+## Networking Philosophy
+
+- DNS names are preferred over IP addresses.
+- Host names identify machines.
+- Service names identify capabilities.
+- Applications should never depend on which machine hosts them.
+- Docker service names should be used for internal communication.
+- `home.arpa` is the stable public namespace of the HomeLab.
+
 ## Reverse Proxy Rules
 
 - Caddy is the only HTTP reverse proxy.
@@ -112,44 +118,47 @@ Every application should:
 - join the shared `proxy` network
 - be reachable through Caddy
 
+Application containers should communicate over Docker networks and use Docker DNS service names internally.
+
+Host port publishing should be avoided unless the protocol requires direct LAN access. Only infrastructure services, such as DNS and the reverse proxy, should normally publish ports to the host.
+
 Infrastructure services may expose ports only when required by their protocols. For example, DNS must publish TCP/UDP port `53` directly because DNS is not HTTP traffic.
+
+## Image Versioning
+
+- Never use mutable image tags such as `latest`.
+- Pin every infrastructure and application image to explicit versions.
+- Image upgrades should always be deliberate Git commits.
+- Reproducible deployments are preferred over automatic upgrades.
 
 ## Repository Rules
 
-Infrastructure belongs under:
+Infrastructure belongs under `infrastructure/`.
 
-```text
-infrastructure/
-```
+Applications belong under `applications/`.
 
-Applications belong under:
-
-```text
-applications/
-```
-
-Every application should contain:
-
-```text
-compose.yaml
-README.md
-```
+Every application should contain `compose.yaml` and `README.md`.
 
 Persistent runtime data belongs in local data directories. Runtime data must never be committed.
 
 ## Security Rules
 
-Never commit:
-
-- `.env`
-- passwords
-- API keys
-- runtime data
-- generated databases
+Never commit `.env`, passwords, API keys, runtime data, or generated databases.
 
 Prefer environment variables for configuration.
 
 Do not expose services to the Internet unless explicitly requested.
+
+## Least Privilege
+
+AI agents should avoid giving containers unnecessary privileges.
+
+- Do not mount `/var/run/docker.sock` into application containers unless there is a clear architectural justification.
+- Prefer least-privilege integrations.
+- Avoid `privileged: true`.
+- Avoid unnecessary Linux capabilities.
+- Avoid host networking unless required.
+- Prefer read-only mounts whenever practical.
 
 ## Documentation Rules
 
@@ -159,6 +168,8 @@ Whenever architecture changes, update:
 - relevant files in `docs/`
 
 Do not leave documentation outdated. Architecture documentation is part of the implementation.
+
+Documentation should explain why a design decision exists, not only what was configured. Architectural rationale is more valuable than implementation details.
 
 ## Backwards Compatibility
 
@@ -178,6 +189,12 @@ Before introducing a new pattern, check whether an existing pattern can be reuse
 Prefer consistency over novelty.
 
 When adding a new application, follow the structure of existing applications. Do not invent new directory layouts without strong justification.
+
+## Repository Evolution
+
+New architectural patterns should emerge only after at least two real use cases.
+
+Avoid introducing abstractions for hypothetical future needs.
 
 ## Preferred Development Workflow
 
@@ -199,7 +216,6 @@ Future services may include:
 - Jellyfin
 - Immich
 - Paperless
-- Homepage
 - Grafana
 - Prometheus
 

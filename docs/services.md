@@ -9,6 +9,7 @@ Services should use names under `home.arpa`:
 | Service | Planned name |
 | --- | --- |
 | DNS Web UI | `dns.home.arpa` |
+| Homepage | `homepage.home.arpa` |
 | Jellyfin | `jellyfin.home.arpa` |
 | Immich | `immich.home.arpa` |
 | Grafana | `grafana.home.arpa` |
@@ -18,6 +19,8 @@ Services should use names under `home.arpa`:
 The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application names should not require DNS changes. Caddy decides which container receives each HTTP request.
 
 Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts, not this service naming table.
+
+`homepage.home.arpa` is the stable public contract for the HomeLab dashboard. Homepage is the current implementation and can be replaced later without changing the client-facing URL.
 
 `speedtest.home.arpa` is the stable public contract. OpenSpeedTest is the current implementation and can be replaced later without changing the client-facing URL.
 
@@ -39,6 +42,7 @@ Current applications:
 
 | Path | Status |
 | --- | --- |
+| `applications/homepage/` | Current implementation of `homepage.home.arpa`. |
 | `applications/openspeedtest/` | Current implementation of `speedtest.home.arpa`. |
 
 ## Future Application Onboarding
@@ -60,6 +64,18 @@ Caddy is the single HomeLab HTTP entrypoint. Application HTTP ports should not b
 Direct application port publishing is acceptable only for short-lived testing or troubleshooting, and should be removed once the service is routed through Caddy.
 
 For now, Caddy publishes HTTP only on port `80`. HTTPS/TLS will be handled later as a separate step.
+
+## Homepage
+
+Homepage is reachable at:
+
+```text
+http://homepage.home.arpa
+```
+
+Caddy routes `homepage.home.arpa` to the `homepage` Docker service on port `3000`. The Homepage container does not publish ports directly to the LAN and is reachable only through Caddy.
+
+Homepage configuration is stored in `applications/homepage/config/` and committed to Git. It intentionally contains no secrets. Widgets requiring authentication should be added incrementally once a token strategy exists.
 
 ## OpenSpeedTest
 

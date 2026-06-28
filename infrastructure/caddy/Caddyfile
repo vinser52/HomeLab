@@ -5,3 +5,7 @@ http://dns.home.arpa {
 http://speedtest.home.arpa {
     reverse_proxy openspeedtest:3000
 }
+
+http://homepage.home.arpa {
+    reverse_proxy homepage:3000
+}

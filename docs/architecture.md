@@ -8,7 +8,7 @@ This HomeLab is organized around contracts first and implementations second. The
 | --- | --- | --- |
 | Environment | Physical network, router, DHCP, fixed leases, Wi-Fi, Ethernet. | FritzBox plus a fixed lease for the Ubuntu HomeLab server. |
 | Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, Caddy. |
-| Application | User-facing services. | OpenSpeedTest, future Jellyfin, Immich, Paperless, and similar apps. |
+| Application | User-facing services. | Homepage, OpenSpeedTest, future Jellyfin, Immich, Paperless, and similar apps. |
 
 ## Environment Layer
 
@@ -37,6 +37,7 @@ Current application service:
 
 | Service contract | Current implementation | Path |
 | --- | --- | --- |
+| `homepage.home.arpa` | Homepage | `applications/homepage/` |
 | `speedtest.home.arpa` | OpenSpeedTest | `applications/openspeedtest/` |
 
 ## Contracts Over Implementations
@@ -77,11 +78,11 @@ Applications should never expose which machine they run on. Today, `jellyfin.hom
 
 ## DNS And Caddy Boundaries
 
-Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `speedtest.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
+Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
 
 Caddy does not proxy DNS protocol traffic. DNS uses TCP/UDP port `53`, not HTTP/HTTPS, so DNS clients must reach the DNS service directly on the HomeLab server. Only Web UIs and application HTTP/HTTPS traffic belong behind Caddy.
 
-The first infrastructure Web UI behind Caddy is Technitium at `http://dns.home.arpa`. The first application behind Caddy is OpenSpeedTest at `http://speedtest.home.arpa`.
+The first infrastructure Web UI behind Caddy is Technitium at `http://dns.home.arpa`. Homepage is available at `http://homepage.home.arpa`, and OpenSpeedTest is available at `http://speedtest.home.arpa`.
 
 For now, Caddy publishes HTTP only on `192.168.178.2:80/tcp`. HTTPS/TLS is planned for a later step and is not configured yet.
 
