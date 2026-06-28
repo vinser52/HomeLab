@@ -9,7 +9,7 @@ The current runtime service is Technitium DNS Server. Future application service
 | Component | Current value | Notes |
 | --- | --- | --- |
 | Router | `192.168.178.1` | FritzBox handles routing, NAT, Wi-Fi, and DHCP. |
-| HomeLab server | `192.168.178.2` | Assigned by FritzBox DHCP reservation / fixed lease. |
+| HomeLab server | `192.168.178.2` | Assigned by FritzBox DHCP reservation / fixed lease; stable hostname is `homelab-server.home.arpa`. |
 | DHCP range | starts at `192.168.178.20` | Keeps infrastructure addresses outside the normal client range. |
 | Local domain | `home.arpa` | Local-only domain for HomeLab names. |
 | DNS service | Technitium DNS Server | Current implementation of the DNS service contract. |

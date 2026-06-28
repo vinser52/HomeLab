@@ -7,7 +7,7 @@ This document describes the current physical and IP network assumptions for the 
 | Item | Value | Notes |
 | --- | --- | --- |
 | Router / FritzBox | `192.168.178.1` | Gateway, NAT, Wi-Fi, and DHCP. |
-| HomeLab server | `192.168.178.2` | NUC-like Ubuntu server. |
+| HomeLab server | `192.168.178.2` | NUC-like Ubuntu server; stable hostname is `homelab-server.home.arpa`. |
 | DHCP client range | starts at `192.168.178.20` | Normal clients should receive addresses from this range upward. |
 | Local domain | `home.arpa` | Stable local naming independent of the current subnet. |
 
@@ -46,6 +46,8 @@ LOCAL_DOMAIN=home.arpa
 
 When moving to another router, apartment, ISP, or subnet, expect the environment layer to change first.
 
+IP addresses may change in the future when moving to another network, but hostnames should remain stable wherever possible.
+
 Likely changes:
 
 | Item | May change? | Notes |
@@ -53,7 +55,7 @@ Likely changes:
 | Router IP | Yes | A new router may use a different subnet. |
 | HomeLab server IP | Yes | Update the FritzBox or new router fixed lease and `.env`. |
 | DHCP range | Yes | Keep infrastructure addresses outside the client pool where possible. |
-| `home.arpa` names | Ideally no | Service naming should stay stable across moves. |
+| `home.arpa` names | Ideally no | Host and service naming should stay stable across moves. |
 | Docker service layout | Ideally no | Application and platform compose files should not need subnet-specific edits. |
 
-The goal is that only the environment layer needs reconfiguration after moving. Local service names such as `homelab.home.arpa`, `dns.home.arpa`, and future application names should remain stable.
+The goal is that only the environment layer needs reconfiguration after moving. Host names such as `homelab-server.home.arpa` and service names such as `dns.home.arpa` should remain stable.

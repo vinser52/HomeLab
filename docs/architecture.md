@@ -48,9 +48,31 @@ Technitium is the current DNS implementation. A future migration to AdGuard Home
 | --- | --- |
 | Local domain | `home.arpa` resolves only inside the local network. |
 | Router record | `router.home.arpa` points to `192.168.178.1`. |
-| HomeLab record | `homelab.home.arpa` points to `192.168.178.2`. |
+| HomeLab server record | `homelab-server.home.arpa` points to `192.168.178.2`. |
 | Wildcard record | `*.home.arpa` points to `192.168.178.2`. |
 | Client DNS | FritzBox DHCP announces `192.168.178.2` as the local DNS server. |
+
+## Host Names vs Service Names
+
+The local namespace separates infrastructure hosts from services. Host names identify physical or virtual machines. Service names identify applications.
+
+Infrastructure hosts:
+
+- `router.home.arpa`
+- `homelab-server.home.arpa`
+- Future example: `gpu-server.home.arpa`
+- Future example: `backup-server.home.arpa`
+- Future example: `build-server.home.arpa`
+
+Services:
+
+- `dns.home.arpa`
+- `jellyfin.home.arpa`
+- `immich.home.arpa`
+- `paperless.home.arpa`
+- `grafana.home.arpa`
+
+Applications should never expose which machine they run on. Today, `jellyfin.home.arpa` may be served by `homelab-server.home.arpa`. Later, it could route to `gpu-server.home.arpa`. Clients should continue using `jellyfin.home.arpa` either way.
 
 ## DNS And Caddy Boundaries
 

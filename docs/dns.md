@@ -11,7 +11,7 @@ The local DNS domain is `home.arpa`. The current DNS service implementation is T
 | Name | Type | Value | Purpose |
 | --- | --- | --- | --- |
 | `router.home.arpa` | `A` | `192.168.178.1` | Stable name for the FritzBox. |
-| `homelab.home.arpa` | `A` | `192.168.178.2` | Stable name for the HomeLab server. |
+| `homelab-server.home.arpa` | `A` | `192.168.178.2` | Stable name for the HomeLab server. |
 | `*.home.arpa` | `A` | `192.168.178.2` | Routes future service names to the HomeLab server. |
 
 `dns.home.arpa` does not need a dedicated `A` record because it is covered by `*.home.arpa`. Later, Caddy will route HTTP/HTTPS requests for `dns.home.arpa` to the Technitium Web UI.
@@ -31,7 +31,7 @@ Add these records:
 | Name | Type | Value |
 | --- | --- | --- |
 | `router` | `A` | `192.168.178.1` |
-| `homelab` | `A` | `192.168.178.2` |
+| `homelab-server` | `A` | `192.168.178.2` |
 | `*` | `A` | `192.168.178.2` |
 
 ## FritzBox DNS Decision
@@ -52,7 +52,7 @@ Run these from a client or from the server:
 ```bash
 nslookup google.com 192.168.178.2
 nslookup router.home.arpa 192.168.178.2
-nslookup homelab.home.arpa 192.168.178.2
+nslookup homelab-server.home.arpa 192.168.178.2
 nslookup jellyfin.home.arpa 192.168.178.2
 dig @192.168.178.2 +short jellyfin.home.arpa
 ```
@@ -63,7 +63,7 @@ Expected results:
 | --- | --- |
 | `google.com` | Public DNS answer. |
 | `router.home.arpa` | `192.168.178.1` |
-| `homelab.home.arpa` | `192.168.178.2` |
+| `homelab-server.home.arpa` | `192.168.178.2` |
 | `jellyfin.home.arpa` | `192.168.178.2`, resolved through the `*.home.arpa` wildcard record. |
 
 ## `fritz.box`

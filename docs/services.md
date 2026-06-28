@@ -8,14 +8,16 @@ Services should use names under `home.arpa`:
 
 | Service | Planned name |
 | --- | --- |
-| HomeLab server | `homelab.home.arpa` |
 | DNS Web UI | `dns.home.arpa` |
 | Jellyfin | `jellyfin.home.arpa` |
 | Immich | `immich.home.arpa` |
+| Grafana | `grafana.home.arpa` |
 | OpenSpeedTest | `speedtest.home.arpa` |
 | Paperless | `paperless.home.arpa` |
 
 The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application names should not require DNS changes. Caddy will later decide which container receives each HTTP/HTTPS request.
+
+Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts, not this service naming table.
 
 ## Folder Convention
 
