@@ -6,7 +6,7 @@ Network assumptions:
 
 - FritzBox router: `192.168.178.1`
 - HomeLab server: `192.168.178.188`
-- Local domain: `lab.home.arpa`
+- Local domain: `home.arpa`
 - Technitium web UI: `http://192.168.178.188:5380`
 - DNS service: `192.168.178.188:53` over TCP and UDP
 
@@ -18,7 +18,13 @@ HomeLab/
 |-- .env.example
 |-- .gitignore
 |-- README.md
+|-- docs/
+|   |-- architecture.md
+|   |-- dns.md
+|   `-- networking.md
 |-- infrastructure/
+|   |-- caddy/
+|   |   `-- README.md
 |   `-- technitium/
 |       |-- compose.yaml
 |       `-- data/
@@ -57,26 +63,26 @@ Technitium data persists under `infrastructure/technitium/data/` and is ignored 
 ## Initial Technitium DNS Configuration
 
 1. Sign in to the Technitium web UI with the admin password from `.env`.
-2. Create a primary zone named `lab.home.arpa`.
+2. Create a primary zone named `home.arpa`.
 3. Add a wildcard `A` record:
 
    - Name: `*`
    - Type: `A`
    - Value: `192.168.178.188`
 
-4. Optionally add an apex `A` record for `lab.home.arpa` pointing to `192.168.178.188` if you also want the root name to resolve.
+4. Optionally add an apex `A` record for `home.arpa` pointing to `192.168.178.188` if you also want the root name to resolve.
 
 ## DNS Testing
 
 Use either `nslookup` or `dig` from a client that is pointed at `192.168.178.188`.
 
 ```bash
-nslookup test.lab.home.arpa 192.168.178.188
-dig @192.168.178.188 test.lab.home.arpa
-dig @192.168.178.188 anything.lab.home.arpa +short
+nslookup test.home.arpa 192.168.178.188
+dig @192.168.178.188 test.home.arpa
+dig @192.168.178.188 anything.home.arpa +short
 ```
 
-Expected result: wildcard names under `lab.home.arpa` should resolve to `192.168.178.188`.
+Expected result: wildcard names under `home.arpa` should resolve to `192.168.178.188`.
 
 ## FritzBox DNS Test Scenarios
 
@@ -90,8 +96,8 @@ Goal: clients receive `192.168.178.188` directly as their DNS server via DHCP.
 4. Test:
 
    ```bash
-   nslookup test.lab.home.arpa
-   dig test.lab.home.arpa
+   nslookup test.home.arpa
+   dig test.home.arpa
    ```
 
 If the client shows `192.168.178.188` as its resolver and the queries succeed, DHCP distribution is working.
@@ -110,8 +116,8 @@ Goal: FritzBox stays the client-facing resolver, but forwards upstream queries t
 4. Test from a client:
 
    ```bash
-   nslookup test.lab.home.arpa
-   dig test.lab.home.arpa
+   nslookup test.home.arpa
+   dig test.home.arpa
    ```
 
 5. Verify that local names still resolve and that general internet DNS continues working if Technitium is unavailable.

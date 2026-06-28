@@ -6,12 +6,12 @@ services:
     restart: unless-stopped
     ports:
       # TODO: When Caddy is added, stop publishing 5380 on the host and expose
-      # the Web UI only through Caddy as dns.lab.home.arpa.
+      # the Web UI only through Caddy as dns.home.arpa.
       - "${HOMELAB_SERVER_IP:-192.168.178.188}:5380:5380/tcp"
       - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/tcp"
       - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/udp"
     environment:
-      DNS_SERVER_DOMAIN: ${LAB_DOMAIN:-lab.home.arpa}
+      DNS_SERVER_DOMAIN: ${LOCAL_DOMAIN:-home.arpa}
       DNS_SERVER_ADMIN_PASSWORD: ${DNS_SERVER_ADMIN_PASSWORD}
       # Recursive resolution is limited to private networks on the LAN.
       DNS_SERVER_RECURSION: AllowOnlyForPrivateNetworks
