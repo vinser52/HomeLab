@@ -1,0 +1,13 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Docker runtime data
+infrastructure/technitium/data/
+runtime/
+logs/
+*/logs/
+
+# OS/editor noise
+.DS_Store

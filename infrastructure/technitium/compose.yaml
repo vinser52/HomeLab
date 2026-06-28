@@ -1,0 +1,25 @@
+services:
+  technitium:
+    image: docker.io/technitium/dns-server:${TECHNITIUM_IMAGE_TAG:-15.2.0}
+    container_name: technitium-dns
+    hostname: technitium-dns
+    restart: unless-stopped
+    ports:
+      # TODO: When Caddy is added, stop publishing 5380 on the host and expose
+      # the Web UI only through Caddy as dns.lab.home.arpa.
+      - "${HOMELAB_SERVER_IP:-192.168.178.188}:5380:5380/tcp"
+      - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/tcp"
+      - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/udp"
+    environment:
+      DNS_SERVER_DOMAIN: ${LAB_DOMAIN:-lab.home.arpa}
+      DNS_SERVER_ADMIN_PASSWORD: ${DNS_SERVER_ADMIN_PASSWORD}
+      # Recursive resolution is limited to private networks on the LAN.
+      DNS_SERVER_RECURSION: AllowOnlyForPrivateNetworks
+      DNS_SERVER_LOG_USING_LOCAL_TIME: "true"
+      DNS_SERVER_LOG_FOLDER_PATH: /var/log/technitium/dns
+    volumes:
+      - ./data/config:/etc/dns
+      - ./data/logs:/var/log/technitium/dns
+    # Expands the ephemeral source port range to match the upstream example.
+    sysctls:
+      net.ipv4.ip_local_port_range: "1024 65535"
