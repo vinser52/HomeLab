@@ -1,2 +1,8 @@
 include:
   - ./infrastructure/technitium/compose.yaml
+  - ./infrastructure/caddy/compose.yaml
+
+networks:
+  # Shared HTTP proxy network managed by this Compose project.
+  proxy:
+    name: proxy

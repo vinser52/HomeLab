@@ -5,6 +5,8 @@
 
 # Docker runtime data
 infrastructure/technitium/data/
+infrastructure/caddy/data/
+infrastructure/caddy/config/
 runtime/
 logs/
 */logs/

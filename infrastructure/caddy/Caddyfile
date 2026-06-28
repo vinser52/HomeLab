@@ -1,0 +1,3 @@
+http://dns.home.arpa {
+    reverse_proxy technitium:5380
+}

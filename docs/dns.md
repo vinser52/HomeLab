@@ -14,9 +14,9 @@ The local DNS domain is `home.arpa`. The current DNS service implementation is T
 | `homelab-server.home.arpa` | `A` | `192.168.178.2` | Stable name for the HomeLab server. |
 | `*.home.arpa` | `A` | `192.168.178.2` | Routes future service names to the HomeLab server. |
 
-`dns.home.arpa` does not need a dedicated `A` record because it is covered by `*.home.arpa`. Later, Caddy will route HTTP/HTTPS requests for `dns.home.arpa` to the Technitium Web UI.
+`dns.home.arpa` does not need a dedicated `A` record because it is covered by `*.home.arpa`. Caddy routes HTTP requests for `dns.home.arpa` to the Technitium Web UI.
 
-DNS protocol traffic itself still goes directly to the DNS service on TCP/UDP port `53`. It cannot be routed through Caddy. Only the Technitium Web UI can move behind Caddy later.
+DNS protocol traffic itself still goes directly to the DNS service on TCP/UDP port `53`. It cannot be routed through Caddy. Only the Technitium Web UI and other HTTP/HTTPS services belong behind Caddy.
 
 ## Technitium Setup Notes
 
@@ -53,6 +53,7 @@ Run these from a client or from the server:
 nslookup google.com 192.168.178.2
 nslookup router.home.arpa 192.168.178.2
 nslookup homelab-server.home.arpa 192.168.178.2
+nslookup dns.home.arpa 192.168.178.2
 nslookup jellyfin.home.arpa 192.168.178.2
 dig @192.168.178.2 +short jellyfin.home.arpa
 ```
@@ -64,7 +65,18 @@ Expected results:
 | `google.com` | Public DNS answer. |
 | `router.home.arpa` | `192.168.178.1` |
 | `homelab-server.home.arpa` | `192.168.178.2` |
+| `dns.home.arpa` | `192.168.178.2`, resolved through the `*.home.arpa` wildcard record. |
 | `jellyfin.home.arpa` | `192.168.178.2`, resolved through the `*.home.arpa` wildcard record. |
+
+## Technitium Web UI
+
+The Technitium Web UI is available through Caddy:
+
+```text
+http://dns.home.arpa
+```
+
+Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. Caddy publishes HTTP only for now; HTTPS/TLS will be handled later.
 
 ## `fritz.box`
 

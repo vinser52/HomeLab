@@ -15,7 +15,7 @@ Services should use names under `home.arpa`:
 | OpenSpeedTest | `speedtest.home.arpa` |
 | Paperless | `paperless.home.arpa` |
 
-The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application names should not require DNS changes. Caddy will later decide which container receives each HTTP/HTTPS request.
+The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application names should not require DNS changes. Caddy decides which container receives each HTTP request.
 
 Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts, not this service naming table.
 
@@ -31,7 +31,7 @@ Current infrastructure:
 | Path | Status |
 | --- | --- |
 | `infrastructure/technitium/` | Current DNS implementation. |
-| `infrastructure/caddy/` | Planned reverse proxy placeholder. |
+| `infrastructure/caddy/` | Current HTTP reverse proxy. |
 
 Current applications:
 
@@ -53,6 +53,8 @@ No DNS change should be needed for normal application names because `*.home.arpa
 
 ## Port Publishing Rule
 
-Once Caddy is used, application HTTP ports should not be published directly to the LAN. Caddy should be the single HTTP/HTTPS entrypoint, and it should reach application containers through Docker networks and service names.
+Caddy is the single HomeLab HTTP entrypoint. Application HTTP ports should not be published directly to the LAN once a service is behind Caddy. Caddy should reach application containers through Docker networks and service names.
 
 Direct application port publishing is acceptable only for short-lived testing or troubleshooting, and should be removed once the service is routed through Caddy.
+
+For now, Caddy publishes HTTP only on port `80`. HTTPS/TLS will be handled later as a separate step.

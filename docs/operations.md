@@ -20,6 +20,8 @@ git pull
 docker compose config
 docker compose up -d
 docker compose ps
+docker compose logs --tail=100 caddy
+docker compose logs --tail=100 technitium
 ```
 
 Git is the source of truth for intended configuration. Runtime data and local secrets stay outside Git.
@@ -39,8 +41,31 @@ Git is the source of truth for intended configuration. Runtime data and local se
 Example:
 
 ```bash
+docker compose logs --tail=100 caddy
 docker compose logs --tail=100 technitium
 ```
+
+## Validation
+
+After deployment, validate DNS and HTTP routing from a Mac or LAN client.
+
+DNS tests:
+
+```bash
+nslookup dns.home.arpa 192.168.178.2
+nslookup router.home.arpa 192.168.178.2
+nslookup homelab-server.home.arpa 192.168.178.2
+```
+
+HTTP test:
+
+```bash
+curl -I http://dns.home.arpa
+```
+
+Expected result: `dns.home.arpa` resolves to `192.168.178.2`, Caddy answers on port `80`, and the Technitium Web UI is reachable through Caddy.
+
+Direct access to `http://192.168.178.2:5380` is no longer expected. The Technitium Web UI is exposed only inside Docker and published through Caddy.
 
 ## `.env` Handling
 
@@ -68,6 +93,13 @@ Runtime data is intentionally ignored by Git. Technitium stores configuration an
 
 ```text
 infrastructure/technitium/data/
+```
+
+Caddy stores runtime state under:
+
+```text
+infrastructure/caddy/data/
+infrastructure/caddy/config/
 ```
 
 Back up runtime data before destructive maintenance once the DNS service becomes important for daily use.

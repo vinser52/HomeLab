@@ -7,7 +7,7 @@ This HomeLab is organized around contracts first and implementations second. The
 | Layer | Responsibility | Current implementation |
 | --- | --- | --- |
 | Environment | Physical network, router, DHCP, fixed leases, Wi-Fi, Ethernet. | FritzBox plus a fixed lease for the Ubuntu HomeLab server. |
-| Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, planned Caddy. |
+| Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, Caddy. |
 | Application | User-facing services. | Future Jellyfin, Immich, OpenSpeedTest, Paperless, and similar apps. |
 
 ## Environment Layer
@@ -25,18 +25,13 @@ Current platform service:
 | Service contract | Current implementation | Path |
 | --- | --- | --- |
 | DNS resolver and authoritative local zone | Technitium DNS Server | `infrastructure/technitium/` |
-
-Planned platform service:
-
-| Service contract | Planned implementation | Path |
-| --- | --- | --- |
 | HTTP/HTTPS reverse proxy | Caddy | `infrastructure/caddy/` |
 
 ## Application Layer
 
-Applications are planned for `applications/<service>/`. Each app should have its own compose file and should be reachable through Caddy once the reverse proxy exists.
+Applications are planned for `applications/<service>/`. Each app should have its own compose file and should be reachable through Caddy once added.
 
-After Caddy is in place, applications should not publish HTTP ports directly to the LAN except during short-lived testing. Caddy should reach application containers through Docker networks and service names.
+Applications should not publish HTTP ports directly to the LAN except during short-lived testing. Caddy should reach application containers through Docker networks and service names.
 
 ## Contracts Over Implementations
 
@@ -76,9 +71,13 @@ Applications should never expose which machine they run on. Today, `jellyfin.hom
 
 ## DNS And Caddy Boundaries
 
-Caddy will be the single HTTP/HTTPS entrypoint in the future. It can route names such as `dns.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
+Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
 
 Caddy does not proxy DNS protocol traffic. DNS uses TCP/UDP port `53`, not HTTP/HTTPS, so DNS clients must reach the DNS service directly on the HomeLab server. Only Web UIs and application HTTP/HTTPS traffic belong behind Caddy.
+
+The first service behind Caddy is the Technitium Web UI at `http://dns.home.arpa`. Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running.
+
+For now, Caddy publishes HTTP only on `192.168.178.2:80/tcp`. HTTPS/TLS is planned for a later step and is not configured yet.
 
 ## Request Flow
 
@@ -95,7 +94,7 @@ HomeLab IP: 192.168.178.2
   |
   | HTTP/HTTPS request for jellyfin.home.arpa
   v
-Caddy reverse proxy (planned)
+Caddy reverse proxy
   |
   | Docker network + service name
   v

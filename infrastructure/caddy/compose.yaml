@@ -1,0 +1,16 @@
+services:
+  caddy:
+    image: docker.io/library/caddy:2.11.4
+    container_name: caddy
+    restart: unless-stopped
+    depends_on:
+      - technitium
+    ports:
+      # HTTP only for now. HTTPS/TLS will be added as a separate step.
+      - "${HOMELAB_SERVER_IP:-192.168.178.2}:80:80/tcp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+      - ./config:/config
+    networks:
+      - proxy

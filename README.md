@@ -2,7 +2,7 @@
 
 This repository is the source of truth for a Docker Compose based HomeLab. It is developed and deployed to a home Ubuntu server via Git, and currently runs infrastructure services for the local network.
 
-The current runtime service is Technitium DNS Server. Future application services will live under `applications/` and should eventually be routed through Caddy.
+The current runtime services are Technitium DNS Server and Caddy. Technitium provides DNS, while Caddy is the local HTTP reverse proxy. Future application services will live under `applications/` and should normally be routed through Caddy.
 
 ## Current Environment
 
@@ -13,6 +13,7 @@ The current runtime service is Technitium DNS Server. Future application service
 | DHCP range | starts at `192.168.178.20` | Keeps infrastructure addresses outside the normal client range. |
 | Local domain | `home.arpa` | Local-only domain for HomeLab names. |
 | DNS service | Technitium DNS Server | Current implementation of the DNS service contract. |
+| HTTP reverse proxy | Caddy | Routes local HTTP service names such as `dns.home.arpa`. |
 
 ## Repository Structure
 
@@ -30,6 +31,8 @@ HomeLab/
 |   `-- services.md
 |-- infrastructure/
 |   |-- caddy/
+|   |   |-- Caddyfile
+|   |   |-- compose.yaml
 |   |   `-- README.md
 |   `-- technitium/
 |       |-- compose.yaml
@@ -37,9 +40,9 @@ HomeLab/
 `-- applications/
 ```
 
-`infrastructure/` contains platform services such as DNS and the planned Caddy reverse proxy. `applications/` is reserved for user-facing app stacks such as Jellyfin, Immich, OpenSpeedTest, and similar services.
+`infrastructure/` contains platform services such as DNS and the Caddy reverse proxy. `applications/` is reserved for user-facing app stacks such as Jellyfin, Immich, OpenSpeedTest, and similar services.
 
-Runtime state is intentionally not committed. For example, Technitium data lives under `infrastructure/technitium/data/` and `.env` is local to each deployment.
+Runtime state is intentionally not committed. For example, Technitium data lives under `infrastructure/technitium/data/`, Caddy runtime data lives under `infrastructure/caddy/data/` and `infrastructure/caddy/config/`, and `.env` is local to each deployment.
 
 ## Quick Start On The Server
 
@@ -63,11 +66,40 @@ docker compose up -d
 docker compose ps
 ```
 
-Open the current Technitium Web UI directly while Caddy is not installed yet:
+Check recent service logs if needed:
+
+```bash
+docker compose logs --tail=100 caddy
+docker compose logs --tail=100 technitium
+```
+
+Open the Technitium Web UI through Caddy:
 
 ```text
-http://192.168.178.2:5380
+http://dns.home.arpa
 ```
+
+Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. DNS protocol traffic still goes directly to Technitium on `192.168.178.2:53/tcp` and `192.168.178.2:53/udp`.
+
+For now, Caddy serves HTTP only on port `80`. HTTPS/TLS will be added later as a separate step.
+
+## Validation
+
+DNS tests:
+
+```bash
+nslookup dns.home.arpa 192.168.178.2
+nslookup router.home.arpa 192.168.178.2
+nslookup homelab-server.home.arpa 192.168.178.2
+```
+
+HTTP test from a Mac or LAN client:
+
+```bash
+curl -I http://dns.home.arpa
+```
+
+Expected result: `dns.home.arpa` resolves to `192.168.178.2`, Caddy answers on port `80`, and the Technitium Web UI is reachable through Caddy.
 
 ## Documentation
 
