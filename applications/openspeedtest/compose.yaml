@@ -1,0 +1,11 @@
+services:
+  openspeedtest:
+    # TODO: Pin to a specific version if/when a reliable versioned tag is chosen.
+    image: openspeedtest/latest
+    container_name: openspeedtest
+    restart: unless-stopped
+    expose:
+      # OpenSpeedTest serves HTTP on port 3000 inside the container.
+      - "3000"
+    networks:
+      - proxy

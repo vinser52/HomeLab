@@ -1,6 +1,7 @@
 include:
   - ./infrastructure/technitium/compose.yaml
   - ./infrastructure/caddy/compose.yaml
+  - ./applications/openspeedtest/compose.yaml
 
 networks:
   # Shared HTTP proxy network managed by this Compose project.

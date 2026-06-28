@@ -28,7 +28,7 @@ Networking:
 
 Current applications:
 
-- OpenSpeedTest (planned migration into applications/)
+- OpenSpeedTest
 
 ## Project Philosophy
 

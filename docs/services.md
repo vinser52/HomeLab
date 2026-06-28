@@ -19,6 +19,8 @@ The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application nam
 
 Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts, not this service naming table.
 
+`speedtest.home.arpa` is the stable public contract. OpenSpeedTest is the current implementation and can be replaced later without changing the client-facing URL.
+
 ## Folder Convention
 
 | Path | Purpose |
@@ -37,7 +39,7 @@ Current applications:
 
 | Path | Status |
 | --- | --- |
-| `applications/` | Empty and reserved for future services. |
+| `applications/openspeedtest/` | Current implementation of `speedtest.home.arpa`. |
 
 ## Future Application Onboarding
 
@@ -58,3 +60,13 @@ Caddy is the single HomeLab HTTP entrypoint. Application HTTP ports should not b
 Direct application port publishing is acceptable only for short-lived testing or troubleshooting, and should be removed once the service is routed through Caddy.
 
 For now, Caddy publishes HTTP only on port `80`. HTTPS/TLS will be handled later as a separate step.
+
+## OpenSpeedTest
+
+OpenSpeedTest is reachable at:
+
+```text
+http://speedtest.home.arpa
+```
+
+Caddy routes `speedtest.home.arpa` to the `openspeedtest` Docker service on port `3000`. The OpenSpeedTest container does not publish ports directly to the LAN and is reachable only through Caddy.
