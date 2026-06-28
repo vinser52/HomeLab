@@ -1,16 +1,20 @@
 # HomeLab
 
-Docker Compose setup for a small HomeLab DNS stack with Technitium DNS Server.
+This repository is the source of truth for a Docker Compose based HomeLab. It is developed and deployed to a home Ubuntu server via Git, and currently runs infrastructure services for the local network.
 
-Network assumptions:
+The current runtime service is Technitium DNS Server. Future application services will live under `applications/` and should eventually be routed through Caddy.
 
-- FritzBox router: `192.168.178.1`
-- HomeLab server: `192.168.178.188`
-- Local domain: `home.arpa`
-- Technitium web UI: `http://192.168.178.188:5380`
-- DNS service: `192.168.178.188:53` over TCP and UDP
+## Current Environment
 
-## Repository Layout
+| Component | Current value | Notes |
+| --- | --- | --- |
+| Router | `192.168.178.1` | FritzBox handles routing, NAT, Wi-Fi, and DHCP. |
+| HomeLab server | `192.168.178.2` | Assigned by FritzBox DHCP reservation / fixed lease. |
+| DHCP range | starts at `192.168.178.20` | Keeps infrastructure addresses outside the normal client range. |
+| Local domain | `home.arpa` | Local-only domain for HomeLab names. |
+| DNS service | Technitium DNS Server | Current implementation of the DNS service contract. |
+
+## Repository Structure
 
 ```text
 HomeLab/
@@ -21,7 +25,9 @@ HomeLab/
 |-- docs/
 |   |-- architecture.md
 |   |-- dns.md
-|   `-- networking.md
+|   |-- networking.md
+|   |-- operations.md
+|   `-- services.md
 |-- infrastructure/
 |   |-- caddy/
 |   |   `-- README.md
@@ -31,95 +37,54 @@ HomeLab/
 `-- applications/
 ```
 
-`infrastructure/` is for shared platform services that other workloads depend on.
-`applications/` is reserved for app stacks that will sit on top of that base later.
+`infrastructure/` contains platform services such as DNS and the planned Caddy reverse proxy. `applications/` is reserved for user-facing app stacks such as Jellyfin, Immich, OpenSpeedTest, and similar services.
 
-Technitium belongs under `infrastructure/` because DNS is foundational for the rest of the HomeLab.
-DNS cannot be fully hidden behind Caddy later, since DNS traffic uses TCP/UDP port `53` rather than HTTP/HTTPS.
-Only the Technitium Web UI will later move behind Caddy, while the DNS service itself will continue to publish port `53`.
+Runtime state is intentionally not committed. For example, Technitium data lives under `infrastructure/technitium/data/` and `.env` is local to each deployment.
 
-## Setup
+## Quick Start On The Server
 
-1. Copy the example environment file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Review `.env` and change `DNS_SERVER_ADMIN_PASSWORD` before first start.
-
-3. Start the stack:
-
-   ```bash
-   docker compose up -d
-   ```
-
-4. Open the Technitium web UI:
-
-   [http://192.168.178.188:5380](http://192.168.178.188:5380)
-
-Technitium data persists under `infrastructure/technitium/data/` and is ignored by git.
-
-## Initial Technitium DNS Configuration
-
-1. Sign in to the Technitium web UI with the admin password from `.env`.
-2. Create a primary zone named `home.arpa`.
-3. Add a wildcard `A` record:
-
-   - Name: `*`
-   - Type: `A`
-   - Value: `192.168.178.188`
-
-4. Optionally add an apex `A` record for `home.arpa` pointing to `192.168.178.188` if you also want the root name to resolve.
-
-## DNS Testing
-
-Use either `nslookup` or `dig` from a client that is pointed at `192.168.178.188`.
+Run these commands on the Ubuntu HomeLab server:
 
 ```bash
-nslookup test.home.arpa 192.168.178.188
-dig @192.168.178.188 test.home.arpa
-dig @192.168.178.188 anything.home.arpa +short
+git pull
 ```
 
-Expected result: wildcard names under `home.arpa` should resolve to `192.168.178.188`.
+Create a local environment file if it does not exist yet:
 
-## FritzBox DNS Test Scenarios
+```bash
+cp .env.example .env
+```
 
-### Scenario 1: FritzBox DHCP announces Technitium as local DNS
+Edit `.env` for this deployment. Do not commit `.env`; it may contain local settings and secrets.
 
-Goal: clients receive `192.168.178.188` directly as their DNS server via DHCP.
+```bash
+docker compose config
+docker compose up -d
+docker compose ps
+```
 
-1. In FritzBox LAN/DHCP settings, configure the local DNS server handed to clients as `192.168.178.188` if your FritzBox model and firmware expose that option.
-2. Renew DHCP leases on one or more test clients.
-3. Confirm the client now uses `192.168.178.188` for DNS.
-4. Test:
+Open the current Technitium Web UI directly while Caddy is not installed yet:
 
-   ```bash
-   nslookup test.home.arpa
-   dig test.home.arpa
-   ```
+```text
+http://192.168.178.2:5380
+```
 
-If the client shows `192.168.178.188` as its resolver and the queries succeed, DHCP distribution is working.
+## Documentation
 
-### Scenario 2: FritzBox uses Technitium upstream, Cloudflare as fallback
+- [Architecture](docs/architecture.md)
+- [Networking](docs/networking.md)
+- [DNS](docs/dns.md)
+- [Operations](docs/operations.md)
+- [Services](docs/services.md)
 
-Goal: FritzBox stays the client-facing resolver, but forwards upstream queries to Technitium first.
+## Local Configuration
 
-1. In FritzBox internet or DNS settings, configure the custom DNS server to `192.168.178.188` where supported.
-2. Configure Cloudflare as fallback or secondary DNS using:
+Deployment-specific settings live in `.env`, which is ignored by Git. Start from [.env.example](.env.example), set a real `DNS_SERVER_ADMIN_PASSWORD` locally, and keep passwords or API tokens out of the repository.
 
-   - `1.1.1.1`
-   - `1.0.0.1`
+The current expected values are:
 
-3. Leave clients using the FritzBox as their normal DNS server.
-4. Test from a client:
-
-   ```bash
-   nslookup test.home.arpa
-   dig test.home.arpa
-   ```
-
-5. Verify that local names still resolve and that general internet DNS continues working if Technitium is unavailable.
-
-Note: FritzBox DNS options vary by hardware model and FRITZ!OS version. If your router cannot advertise a custom LAN DNS server or cannot use a LAN host as upstream DNS, keep clients pointed directly at `192.168.178.188` instead.
+```env
+FRITZBOX_ROUTER_IP=192.168.178.1
+HOMELAB_SERVER_IP=192.168.178.2
+LOCAL_DOMAIN=home.arpa
+```

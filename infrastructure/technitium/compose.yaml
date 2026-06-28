@@ -7,9 +7,9 @@ services:
     ports:
       # TODO: When Caddy is added, stop publishing 5380 on the host and expose
       # the Web UI only through Caddy as dns.home.arpa.
-      - "${HOMELAB_SERVER_IP:-192.168.178.188}:5380:5380/tcp"
-      - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/tcp"
-      - "${HOMELAB_SERVER_IP:-192.168.178.188}:53:53/udp"
+      - "${HOMELAB_SERVER_IP:-192.168.178.2}:5380:5380/tcp"
+      - "${HOMELAB_SERVER_IP:-192.168.178.2}:53:53/tcp"
+      - "${HOMELAB_SERVER_IP:-192.168.178.2}:53:53/udp"
     environment:
       DNS_SERVER_DOMAIN: ${LOCAL_DOMAIN:-home.arpa}
       DNS_SERVER_ADMIN_PASSWORD: ${DNS_SERVER_ADMIN_PASSWORD}

@@ -1,0 +1,85 @@
+# Operations
+
+This document covers the normal workflow for deploying and operating the HomeLab from Git.
+
+## Deployment Workflow
+
+Development happens on the MacBook. Runtime happens on the Ubuntu HomeLab server.
+
+Normal flow:
+
+1. Edit documentation or compose files on the MacBook.
+2. Commit and push changes to Git.
+3. SSH into the Ubuntu HomeLab server.
+4. Pull the latest repository state.
+5. Validate Docker Compose.
+6. Apply the stack.
+
+```bash
+git pull
+docker compose config
+docker compose up -d
+docker compose ps
+```
+
+Git is the source of truth for intended configuration. Runtime data and local secrets stay outside Git.
+
+## Useful Commands
+
+| Command | Purpose |
+| --- | --- |
+| `docker compose config` | Render and validate the full Compose configuration. |
+| `docker compose up -d` | Create or update services in the background. |
+| `docker compose ps` | Show service status and published ports. |
+| `docker compose logs --tail=100 <service>` | Show recent logs for one service. |
+| `docker compose stop <service>` | Stop one service without removing containers or data. |
+| `docker compose start <service>` | Start one stopped service. |
+| `docker compose down` | Stop and remove Compose-managed containers and networks. |
+
+Example:
+
+```bash
+docker compose logs --tail=100 technitium
+```
+
+## `.env` Handling
+
+`.env` is local to each deployment and is ignored by Git. Create it from `.env.example` when needed:
+
+```bash
+cp .env.example .env
+chmod 600 .env
+```
+
+Rules:
+
+| Rule | Reason |
+| --- | --- |
+| Do not commit `.env`. | It may contain passwords, tokens, or deployment-specific values. |
+| Do not commit real passwords or API tokens. | Git history is hard to clean safely. |
+| Keep `.env` readable only by the owner where practical. | Limits accidental local exposure. |
+| Update `.env.example` only with safe defaults or placeholder values. | Keeps onboarding easy without leaking secrets. |
+
+For the current HomeLab stage, a protected `.env` file is acceptable. If secret handling becomes more complex, consider Docker secrets, SOPS with age, or Vault-like tools.
+
+## Runtime Data
+
+Runtime data is intentionally ignored by Git. Technitium stores configuration and logs under:
+
+```text
+infrastructure/technitium/data/
+```
+
+Back up runtime data before destructive maintenance once the DNS service becomes important for daily use.
+
+## Technitium Reset For Early Testing Only
+
+During early experiments, it can be useful to wipe Technitium and start fresh:
+
+```bash
+docker compose down
+sudo rm -rf infrastructure/technitium/data
+docker compose up -d
+```
+
+This deletes DNS configuration, zones, records, and logs. Do not use this reset procedure after the DNS service becomes production-like unless you have a backup and intentionally want to rebuild it.
