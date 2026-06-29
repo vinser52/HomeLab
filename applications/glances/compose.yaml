@@ -1,0 +1,20 @@
+services:
+  glances:
+    image: docker.io/nicolargo/glances:${GLANCES_IMAGE_TAG:-4.5.5}
+    container_name: glances
+    restart: unless-stopped
+    expose:
+      # Glances web UI and API listen on port 61208 inside the container.
+      - "61208"
+    environment:
+      # Web server mode exposes the UI and API for Caddy and Homepage.
+      GLANCES_OPT: "-w -C /glances/conf/glances.conf"
+    volumes:
+      # Host filesystem is mounted read-only so Glances can report host disk usage.
+      - /:/host:ro
+      # Show the Ubuntu host OS details instead of only the container base image.
+      - /etc/os-release:/etc/os-release:ro
+      # Explicit host validation is required when Glances is accessed through Caddy.
+      - ./config/glances.conf:/glances/conf/glances.conf:ro
+    networks:
+      - proxy

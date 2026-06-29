@@ -22,9 +22,11 @@ Homepage intentionally contains no secrets. Widgets requiring authentication sho
 
 Enabled widgets:
 
-- Resources: CPU, memory, and disk usage.
+- Glances: CPU, memory, disk usage, and uptime from the Glances API.
 - Date & Time.
 
-The Resources widget uses a read-only host filesystem mount at `/host` so disk usage reflects the HomeLab server instead of only the container filesystem.
+Homepage gets live host metrics from Glances at `http://glances:61208` over the shared Docker `proxy` network. The standalone Glances UI provides deeper live details such as network throughput and load average.
+
+The previous read-only host filesystem mount is no longer needed by Homepage because disk metrics now come from Glances.
 
 Docker socket access is intentionally not enabled. Docker integration can be added later if there is a real operational need.

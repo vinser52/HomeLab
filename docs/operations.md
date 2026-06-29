@@ -24,6 +24,7 @@ docker compose logs --tail=100 caddy
 docker compose logs --tail=100 technitium
 docker compose logs --tail=100 homepage
 docker compose logs --tail=100 openspeedtest
+docker compose logs --tail=100 glances
 ```
 
 Git is the source of truth for intended configuration. Runtime data and local secrets stay outside Git.
@@ -47,6 +48,7 @@ docker compose logs --tail=100 caddy
 docker compose logs --tail=100 technitium
 docker compose logs --tail=100 homepage
 docker compose logs --tail=100 openspeedtest
+docker compose logs --tail=100 glances
 ```
 
 ## Validation
@@ -61,6 +63,7 @@ nslookup router.home.arpa 192.168.178.2
 nslookup homelab-server.home.arpa 192.168.178.2
 nslookup homepage.home.arpa
 nslookup speedtest.home.arpa
+nslookup glances.home.arpa
 ```
 
 HTTP tests:
@@ -69,15 +72,18 @@ HTTP tests:
 curl -I http://dns.home.arpa
 curl -I http://homepage.home.arpa
 curl -I http://speedtest.home.arpa
+curl -I http://glances.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, and `speedtest.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `80`, and the Technitium Web UI, Homepage UI, and OpenSpeedTest UI are reachable through Caddy.
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, and `glances.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `80`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, and Glances UI are reachable through Caddy.
 
 Direct access to `http://192.168.178.2:5380` is no longer expected. The Technitium Web UI is exposed only inside Docker and published through Caddy.
 
 OpenSpeedTest should be accessed through `http://speedtest.home.arpa`. It does not publish an HTTP port directly to the LAN.
 
 Homepage should be accessed through `http://homepage.home.arpa`. It does not publish an HTTP port directly to the LAN. Its committed configuration lives under `applications/homepage/config/` and intentionally contains no secrets.
+
+Glances should be accessed through `http://glances.home.arpa`. It does not publish an HTTP port directly to the LAN. Homepage reads live host metrics from Glances over the internal Docker network.
 
 ## `.env` Handling
 

@@ -9,3 +9,7 @@ http://speedtest.home.arpa {
 http://homepage.home.arpa {
     reverse_proxy homepage:3000
 }
+
+http://glances.home.arpa {
+    reverse_proxy glances:61208
+}

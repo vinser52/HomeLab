@@ -30,6 +30,7 @@ Current applications:
 
 - Homepage
 - OpenSpeedTest
+- Glances
 
 ## Project Philosophy
 
@@ -68,6 +69,14 @@ Infrastructure provides shared platform capabilities. Examples include Technitiu
 Applications provide user-facing functionality. Examples include Homepage, OpenSpeedTest, Jellyfin, Immich, and Paperless.
 
 Keep this boundary clear. Infrastructure should make applications easier to run; applications should not redefine the platform.
+
+## Monitoring Philosophy
+
+Homepage is the HomeLab landing page.
+
+Glances provides live operational status.
+
+Prometheus and Grafana are future historical monitoring tools and should be added only when history, alerting, or dashboards are needed.
 
 ## Contracts vs Implementations
 

@@ -8,7 +8,7 @@ This HomeLab is organized around contracts first and implementations second. The
 | --- | --- | --- |
 | Environment | Physical network, router, DHCP, fixed leases, Wi-Fi, Ethernet. | FritzBox plus a fixed lease for the Ubuntu HomeLab server. |
 | Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, Caddy. |
-| Application | User-facing services. | Homepage, OpenSpeedTest, future Jellyfin, Immich, Paperless, and similar apps. |
+| Application | User-facing services. | Homepage, OpenSpeedTest, Glances, future Jellyfin, Immich, Paperless, and similar apps. |
 
 ## Environment Layer
 
@@ -39,6 +39,7 @@ Current application service:
 | --- | --- | --- |
 | `homepage.home.arpa` | Homepage | `applications/homepage/` |
 | `speedtest.home.arpa` | OpenSpeedTest | `applications/openspeedtest/` |
+| `glances.home.arpa` | Glances | `applications/glances/` |
 
 ## Contracts Over Implementations
 
@@ -69,6 +70,7 @@ Infrastructure hosts:
 Services:
 
 - `dns.home.arpa`
+- `glances.home.arpa`
 - `jellyfin.home.arpa`
 - `immich.home.arpa`
 - `paperless.home.arpa`
@@ -78,13 +80,19 @@ Applications should never expose which machine they run on. Today, `jellyfin.hom
 
 ## DNS And Caddy Boundaries
 
-Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
+Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
 
 Caddy does not proxy DNS protocol traffic. DNS uses TCP/UDP port `53`, not HTTP/HTTPS, so DNS clients must reach the DNS service directly on the HomeLab server. Only Web UIs and application HTTP/HTTPS traffic belong behind Caddy.
 
-The first infrastructure Web UI behind Caddy is Technitium at `http://dns.home.arpa`. Homepage is available at `http://homepage.home.arpa`, and OpenSpeedTest is available at `http://speedtest.home.arpa`.
+The first infrastructure Web UI behind Caddy is Technitium at `http://dns.home.arpa`. Homepage is available at `http://homepage.home.arpa`, OpenSpeedTest is available at `http://speedtest.home.arpa`, and Glances is available at `http://glances.home.arpa`.
 
 For now, Caddy publishes HTTP only on `192.168.178.2:80/tcp`. HTTPS/TLS is planned for a later step and is not configured yet.
+
+## Monitoring
+
+Homepage remains the HomeLab landing page and overview. Glances provides lightweight live host monitoring and supplies the current host metrics displayed by Homepage.
+
+Prometheus and Grafana are intentionally deferred until historical metrics, alerting, or long-term dashboards become necessary. This keeps the current platform simple while preserving a clear path for future observability.
 
 ## Request Flow
 

@@ -3,6 +3,7 @@ include:
   - ./infrastructure/caddy/compose.yaml
   - ./applications/openspeedtest/compose.yaml
   - ./applications/homepage/compose.yaml
+  - ./applications/glances/compose.yaml
 
 networks:
   # Shared HTTP proxy network managed by this Compose project.

@@ -13,3 +13,6 @@
     - OpenSpeedTest:
         href: http://speedtest.home.arpa
         description: LAN speed testing
+    - Glances:
+        href: http://glances.home.arpa
+        description: Live host monitoring

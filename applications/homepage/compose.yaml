@@ -11,7 +11,5 @@ services:
       HOMEPAGE_ALLOWED_HOSTS: homepage.home.arpa
     volumes:
       - ./config:/app/config
-      # Read-only host mount lets the Resources widget report host disk usage.
-      - /:/host:ro
     networks:
       - proxy
