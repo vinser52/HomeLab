@@ -16,3 +16,6 @@
     - Glances:
         href: http://glances.home.arpa
         description: Live host monitoring
+    - Status:
+        href: http://status.home.arpa
+        description: HomeLab availability monitoring

@@ -4,6 +4,7 @@ include:
   - ./applications/openspeedtest/compose.yaml
   - ./applications/homepage/compose.yaml
   - ./applications/glances/compose.yaml
+  - ./applications/uptime-kuma/compose.yaml
 
 networks:
   # Shared HTTP proxy network managed by this Compose project.

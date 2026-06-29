@@ -31,6 +31,7 @@ Current applications:
 - Homepage
 - OpenSpeedTest
 - Glances
+- Uptime Kuma
 
 ## Project Philosophy
 
@@ -75,6 +76,8 @@ Keep this boundary clear. Infrastructure should make applications easier to run;
 Homepage is the HomeLab landing page.
 
 Glances provides live operational status.
+
+Uptime Kuma provides service availability monitoring.
 
 Prometheus and Grafana are future historical monitoring tools and should be added only when history, alerting, or dashboards are needed.
 

@@ -15,6 +15,7 @@ Services should use names under `home.arpa`:
 | Grafana | `grafana.home.arpa` |
 | OpenSpeedTest | `speedtest.home.arpa` |
 | Glances | `glances.home.arpa` |
+| Uptime Kuma | `status.home.arpa` |
 | Paperless | `paperless.home.arpa` |
 
 The wildcard DNS record `*.home.arpa -> 192.168.178.2` means new application names should not require DNS changes. Caddy decides which container receives each HTTP request.
@@ -26,6 +27,8 @@ Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts,
 `speedtest.home.arpa` is the stable public contract. OpenSpeedTest is the current implementation and can be replaced later without changing the client-facing URL.
 
 `glances.home.arpa` is the stable public contract for live host monitoring. Glances is the current implementation and can be replaced later without changing the client-facing URL.
+
+`status.home.arpa` is the stable public contract for service availability monitoring. Uptime Kuma is the current implementation and can be replaced later without changing the client-facing URL.
 
 ## Folder Convention
 
@@ -48,6 +51,7 @@ Current applications:
 | `applications/homepage/` | Current implementation of `homepage.home.arpa`. |
 | `applications/openspeedtest/` | Current implementation of `speedtest.home.arpa`. |
 | `applications/glances/` | Current implementation of `glances.home.arpa`. |
+| `applications/uptime-kuma/` | Current implementation of `status.home.arpa`. |
 
 ## Future Application Onboarding
 
@@ -104,3 +108,26 @@ http://glances.home.arpa
 Caddy routes `glances.home.arpa` to the `glances` Docker service on port `61208`. The Glances container does not publish ports directly to the LAN and is reachable only through Caddy.
 
 Glances provides lightweight live monitoring for the HomeLab server. It is used by Homepage for current host metrics. Prometheus and Grafana are intentionally deferred until historical metrics or alerting become necessary.
+
+## Uptime Kuma
+
+Uptime Kuma is reachable at:
+
+```text
+http://status.home.arpa
+```
+
+Caddy routes `status.home.arpa` to the `uptime-kuma` Docker service on port `3001`. The Uptime Kuma container does not publish ports directly to the LAN and is reachable only through Caddy.
+
+Uptime Kuma monitors HomeLab service availability, response time, uptime history, and local status. Its configuration and history live under `applications/uptime-kuma/data/`, which is runtime data and intentionally ignored by Git.
+
+Initial monitors should be added manually through the Uptime Kuma UI:
+
+| Monitor | URL |
+| --- | --- |
+| Homepage | `http://homepage.home.arpa` |
+| DNS Web UI | `http://dns.home.arpa` |
+| OpenSpeedTest | `http://speedtest.home.arpa` |
+| Glances | `http://glances.home.arpa` |
+
+Use simple HTTP monitors. Notifications and public status pages are intentionally not configured yet.

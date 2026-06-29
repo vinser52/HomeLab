@@ -1,0 +1,13 @@
+services:
+  uptime-kuma:
+    image: docker.io/louislam/uptime-kuma:${UPTIME_KUMA_IMAGE_TAG:-2.4.0}
+    container_name: uptime-kuma
+    restart: unless-stopped
+    expose:
+      # Uptime Kuma serves HTTP on port 3001 inside the container.
+      - "3001"
+    volumes:
+      # Uptime Kuma stores monitors, history, and status data here.
+      - ./data:/app/data
+    networks:
+      - proxy

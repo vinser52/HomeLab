@@ -13,3 +13,7 @@ http://homepage.home.arpa {
 http://glances.home.arpa {
     reverse_proxy glances:61208
 }
+
+http://status.home.arpa {
+    reverse_proxy uptime-kuma:3001
+}
