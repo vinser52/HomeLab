@@ -16,6 +16,10 @@
     - Glances:
         href: http://glances.home.arpa
         description: Live host monitoring
-    - Status:
+    - Uptime Kuma:
         href: http://status.home.arpa
         description: HomeLab availability monitoring
+        widget:
+          type: uptimekuma
+          url: http://uptime-kuma:3001
+          slug: "{{HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG}}"
