@@ -14,6 +14,8 @@ The container does not publish HTTP ports directly to the LAN. Caddy reaches it 
 homepage:3000
 ```
 
+`HOMEPAGE_ALLOWED_HOSTS` is set to `homepage.home.arpa` so Homepage accepts requests routed through Caddy.
+
 Configuration is stored as YAML in `applications/homepage/config/` and committed to Git.
 
 Homepage intentionally contains no secrets. Widgets requiring authentication should be added incrementally once a token strategy exists.

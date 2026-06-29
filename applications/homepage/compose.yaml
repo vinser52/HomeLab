@@ -6,6 +6,9 @@ services:
     expose:
       # Homepage serves HTTP on port 3000 inside the container.
       - "3000"
+    environment:
+      # Required by Homepage when accessed through the Caddy reverse proxy.
+      HOMEPAGE_ALLOWED_HOSTS: homepage.home.arpa
     volumes:
       - ./config:/app/config
     networks:
