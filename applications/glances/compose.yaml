@@ -3,6 +3,8 @@ services:
     image: docker.io/nicolargo/glances:${GLANCES_IMAGE_TAG:-4.5.5}
     container_name: glances
     restart: unless-stopped
+    # Required for Glances to show host processes instead of only the container process.
+    pid: host
     expose:
       # Glances web UI and API listen on port 61208 inside the container.
       - "61208"

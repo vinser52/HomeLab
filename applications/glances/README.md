@@ -22,9 +22,10 @@ Homepage remains the HomeLab landing page. Glances provides the live operational
 
 The container uses only the host access currently needed for lightweight monitoring:
 
+- `pid: host` lets Glances show host processes instead of only the Glances container process.
 - `/:/host:ro` lets Glances report host disk usage without write access.
 - `/etc/os-release:/etc/os-release:ro` lets the UI show host OS details instead of only the container image.
 
-Docker socket access is intentionally not enabled. `privileged: true`, `pid: host`, and host networking are intentionally not used. Network interface visibility may be less complete than a privileged host-network deployment, but this keeps the service aligned with the HomeLab least-privilege posture.
+Docker socket access is intentionally not enabled. `privileged: true` and host networking are intentionally not used. Network interface visibility may be less complete than a privileged host-network deployment, but this keeps the service aligned with the HomeLab least-privilege posture.
 
 Prometheus and Grafana are intentionally deferred until historical metrics, alerting, or long-term dashboards become necessary.
