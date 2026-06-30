@@ -11,6 +11,11 @@
           url: http://technitium:5380
           key: "{{HOMEPAGE_VAR_TECHNITIUM_API_KEY}}"
           range: LastDay
+          fields:
+            - totalQueries
+            - totalServerFailure
+            - totalBlocked
+            - totalCached
     - Router:
         href: http://router.home.arpa
         description: FritzBox router
