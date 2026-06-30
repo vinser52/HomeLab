@@ -18,6 +18,8 @@ homepage:3000
 
 Configuration is stored as YAML in `applications/homepage/config/` and committed to Git.
 
+Service cards in `services.yaml` use explicit icon names so the HomeLab landing page stays visually scannable without changing any public service contracts.
+
 Homepage intentionally contains no committed secrets. Authenticated widgets use `.env` placeholders so tokens stay local to the deployment.
 
 Enabled widgets:

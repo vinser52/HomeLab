@@ -3,9 +3,11 @@
     - Homepage:
         href: https://homepage.home.arpa
         description: HomeLab landing page
+        icon: homepage.png
     - DNS:
         href: https://dns.home.arpa
         description: Technitium DNS Server
+        icon: technitium.png
         widget:
           type: technitium
           url: http://technitium:5380
@@ -19,15 +21,19 @@
     - Router:
         href: http://router.home.arpa
         description: FritzBox router
+        icon: fritzbox.png
     - OpenSpeedTest:
         href: https://speedtest.home.arpa
         description: LAN speed testing
+        icon: openspeedtest.png
     - Glances:
         href: https://glances.home.arpa
         description: Live host monitoring
+        icon: glances.png
     - Uptime Kuma:
         href: https://status.home.arpa
         description: HomeLab availability monitoring
+        icon: uptime-kuma.png
         widget:
           type: uptimekuma
           url: http://uptime-kuma:3001
