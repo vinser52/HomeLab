@@ -83,9 +83,11 @@ https://homepage.home.arpa
 
 Caddy routes `homepage.home.arpa` to the `homepage` Docker service on port `3000`. The Homepage container does not publish ports directly to the LAN and is reachable only through Caddy.
 
-Homepage configuration is stored in `applications/homepage/config/` and committed to Git. It intentionally contains no secrets. Widgets requiring authentication should be added incrementally once a token strategy exists.
+Homepage configuration is stored in `applications/homepage/config/` and committed to Git. It intentionally contains no committed secrets. Authenticated widgets should use local `.env` placeholders so tokens stay out of the repository.
 
 Homepage gets live host metrics from Glances over the internal Docker `proxy` network.
+
+The DNS card also uses Homepage's Technitium widget over Docker networking at `http://technitium:5380`. The widget should authenticate with a dedicated Technitium API token stored only in local `.env` as `HOMEPAGE_VAR_TECHNITIUM_API_KEY`.
 
 ## OpenSpeedTest
 

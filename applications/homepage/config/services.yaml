@@ -6,7 +6,11 @@
     - DNS:
         href: https://dns.home.arpa
         description: Technitium DNS Server
-        # TODO: Add a Technitium widget later once an API token strategy exists.
+        widget:
+          type: technitium
+          url: http://technitium:5380
+          key: "{{HOMEPAGE_VAR_TECHNITIUM_API_KEY}}"
+          range: LastDay
     - Router:
         href: http://router.home.arpa
         description: FritzBox router

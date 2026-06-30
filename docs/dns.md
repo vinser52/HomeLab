@@ -78,6 +78,14 @@ https://dns.home.arpa
 
 Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. The Technitium Web UI is published through Caddy over LAN-only HTTPS using Caddy's internal CA.
 
+## Homepage Widget Token
+
+Homepage can show Technitium DNS statistics on the `dns.home.arpa` card using Technitium's HTTP API.
+
+Create a dedicated Technitium user for Homepage and generate an API token for that user instead of reusing the main administrator account. Store the token only in local `.env` as `HOMEPAGE_VAR_TECHNITIUM_API_KEY`.
+
+This keeps Homepage configuration committed to Git while keeping credentials local to the deployment.
+
 ## `fritz.box`
 
 `fritz.box` may not resolve through Technitium unless a specific record or forwarder is added. Prefer `router.home.arpa` as the stable local router name in HomeLab documentation and scripts.

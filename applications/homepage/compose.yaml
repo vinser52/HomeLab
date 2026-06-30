@@ -9,6 +9,8 @@ services:
     environment:
       # Required by Homepage when accessed through the Caddy reverse proxy.
       HOMEPAGE_ALLOWED_HOSTS: homepage.home.arpa
+      # Homepage's Technitium widget uses a dedicated API token from `.env`.
+      HOMEPAGE_VAR_TECHNITIUM_API_KEY: ${HOMEPAGE_VAR_TECHNITIUM_API_KEY:-}
       # Homepage's Uptime Kuma widget reads a local status page by slug.
       HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG: ${HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG:-homelab}
     volumes:

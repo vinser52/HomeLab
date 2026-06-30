@@ -64,7 +64,7 @@ HomeLab/
 
 Runtime state is intentionally not committed. For example, Technitium data lives under `infrastructure/technitium/data/`, Caddy runtime data lives under `infrastructure/caddy/data/` and `infrastructure/caddy/config/`, Uptime Kuma data lives under `applications/uptime-kuma/data/`, and `.env` is local to each deployment.
 
-Homepage configuration lives under `applications/homepage/config/` and is committed to Git. Homepage intentionally contains no secrets; widgets requiring authentication should be added incrementally once a token strategy exists.
+Homepage configuration lives under `applications/homepage/config/` and is committed to Git. Homepage intentionally contains no committed secrets; authenticated widgets use local `.env` placeholders so API tokens stay out of the repository.
 
 Homepage gets live host metrics from Glances over the internal Docker network. Uptime Kuma monitors service availability and response time. Glances and Uptime Kuma are intentionally lightweight; Prometheus and Grafana are deferred until historical metrics, alerting, or long-term dashboards become necessary.
 
