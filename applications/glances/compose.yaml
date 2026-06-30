@@ -1,6 +1,6 @@
 services:
   glances:
-    image: docker.io/nicolargo/glances:${GLANCES_IMAGE_TAG:-4.5.5}
+    image: docker.io/nicolargo/glances:4.5.5
     container_name: glances
     restart: unless-stopped
     # Required for Glances to show host processes instead of only the container process.

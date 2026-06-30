@@ -30,6 +30,7 @@ HomeLab/
 |-- docs/
 |   |-- architecture.md
 |   |-- dns.md
+|   |-- image-versioning.md
 |   |-- networking.md
 |   |-- operations.md
 |   |-- tls.md
@@ -174,6 +175,7 @@ Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `
 - [Architecture](docs/architecture.md)
 - [Networking](docs/networking.md)
 - [DNS](docs/dns.md)
+- [Image Versioning](docs/image-versioning.md)
 - [Operations](docs/operations.md)
 - [Services](docs/services.md)
 - [TLS](docs/tls.md)

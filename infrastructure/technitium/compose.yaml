@@ -1,6 +1,6 @@
 services:
   technitium:
-    image: docker.io/technitium/dns-server:${TECHNITIUM_IMAGE_TAG:-15.2.0}
+    image: docker.io/technitium/dns-server:15.2.0
     container_name: technitium-dns
     hostname: technitium-dns
     restart: unless-stopped

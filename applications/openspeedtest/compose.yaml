@@ -1,7 +1,6 @@
 services:
   openspeedtest:
-    # TODO: Pin to a specific version if/when a reliable versioned tag is chosen.
-    image: openspeedtest/latest
+    image: docker.io/openspeedtest/latest:v2.0.6
     container_name: openspeedtest
     restart: unless-stopped
     expose:
