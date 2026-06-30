@@ -82,13 +82,13 @@ Applications should never expose which machine they run on. Today, `jellyfin.hom
 
 ## DNS And Caddy Boundaries
 
-Caddy is the HomeLab HTTP reverse proxy. It routes names such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
+Caddy is the HomeLab HTTP/HTTPS reverse proxy. It routes names such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, `jellyfin.home.arpa`, or `immich.home.arpa` to the right container once a client has already resolved the name.
 
 Caddy does not proxy DNS protocol traffic. DNS uses TCP/UDP port `53`, not HTTP/HTTPS, so DNS clients must reach the DNS service directly on the HomeLab server. Only Web UIs and application HTTP/HTTPS traffic belong behind Caddy.
 
-The first infrastructure Web UI behind Caddy is Technitium at `http://dns.home.arpa`. Homepage is available at `http://homepage.home.arpa`, OpenSpeedTest is available at `http://speedtest.home.arpa`, Glances is available at `http://glances.home.arpa`, and Uptime Kuma is available at `http://status.home.arpa`.
+The first infrastructure Web UI behind Caddy is Technitium at `https://dns.home.arpa`. Homepage is available at `https://homepage.home.arpa`, OpenSpeedTest is available at `https://speedtest.home.arpa`, Glances is available at `https://glances.home.arpa`, and Uptime Kuma is available at `https://status.home.arpa`.
 
-For now, Caddy publishes HTTP only on `192.168.178.2:80/tcp`. HTTPS/TLS is planned for a later step and is not configured yet.
+Caddy publishes HTTP on `192.168.178.2:80/tcp` and HTTPS on `192.168.178.2:443/tcp`. HTTPS uses Caddy's internal CA for LAN-only TLS. No public CA, Let's Encrypt, or Internet exposure is involved.
 
 ## Monitoring
 

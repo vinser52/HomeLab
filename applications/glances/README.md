@@ -5,7 +5,7 @@ Glances provides lightweight live host monitoring for the HomeLab.
 Public URL:
 
 ```text
-http://glances.home.arpa
+https://glances.home.arpa
 ```
 
 The container does not publish HTTP ports directly to the LAN. Caddy reaches it over Docker networking at:

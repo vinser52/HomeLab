@@ -1,23 +1,23 @@
 ---
 - Infrastructure:
     - Homepage:
-        href: http://homepage.home.arpa
+        href: https://homepage.home.arpa
         description: HomeLab landing page
     - DNS:
-        href: http://dns.home.arpa
+        href: https://dns.home.arpa
         description: Technitium DNS Server
         # TODO: Add a Technitium widget later once an API token strategy exists.
     - Router:
         href: http://router.home.arpa
         description: FritzBox router
     - OpenSpeedTest:
-        href: http://speedtest.home.arpa
+        href: https://speedtest.home.arpa
         description: LAN speed testing
     - Glances:
-        href: http://glances.home.arpa
+        href: https://glances.home.arpa
         description: Live host monitoring
     - Uptime Kuma:
-        href: http://status.home.arpa
+        href: https://status.home.arpa
         description: HomeLab availability monitoring
         widget:
           type: uptimekuma

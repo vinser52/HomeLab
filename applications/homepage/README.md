@@ -5,7 +5,7 @@ Homepage is the landing page of the HomeLab.
 Public URL:
 
 ```text
-http://homepage.home.arpa
+https://homepage.home.arpa
 ```
 
 The container does not publish HTTP ports directly to the LAN. Caddy reaches it over Docker networking at:
@@ -36,14 +36,14 @@ http://uptime-kuma:3001
 The card opens the user-facing Uptime Kuma UI at:
 
 ```text
-http://status.home.arpa
+https://status.home.arpa
 ```
 
 The widget does not use an API key. It reads from a Uptime Kuma status page identified by `HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG`, which defaults to `homelab`.
 
 Manual setup after deployment:
 
-1. Open `http://status.home.arpa`.
+1. Open `https://status.home.arpa`.
 2. Create the simple HTTP monitors for the HomeLab services.
 3. Create a local status page with slug `homelab`, or set `HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG` in `.env` to match your chosen slug.
 4. Add the monitors to that status page.

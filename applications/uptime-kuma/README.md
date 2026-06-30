@@ -5,7 +5,7 @@ Uptime Kuma provides service availability monitoring for the HomeLab.
 Public URL:
 
 ```text
-http://status.home.arpa
+https://status.home.arpa
 ```
 
 The container does not publish HTTP ports directly to the LAN. Caddy reaches it over Docker networking at:
@@ -37,13 +37,13 @@ After deployment, create simple HTTP monitors manually in the Uptime Kuma UI:
 
 | Monitor | URL |
 | --- | --- |
-| Homepage | `http://homepage.home.arpa` |
-| DNS Web UI | `http://dns.home.arpa` |
-| OpenSpeedTest | `http://speedtest.home.arpa` |
-| Glances | `http://glances.home.arpa` |
+| Homepage | `https://homepage.home.arpa` |
+| DNS Web UI | `https://dns.home.arpa` |
+| OpenSpeedTest | `https://speedtest.home.arpa` |
+| Glances | `https://glances.home.arpa` |
 
 Do not configure notifications yet.
 
 Do not configure public status pages yet.
 
-Docker socket access is intentionally not enabled. Uptime Kuma only needs to make HTTP requests to service URLs for the current HomeLab availability checks.
+Docker socket access is intentionally not enabled. Uptime Kuma only needs to make HTTPS requests to service URLs for the current HomeLab availability checks.

@@ -73,10 +73,10 @@ Expected results:
 The Technitium Web UI is available through Caddy:
 
 ```text
-http://dns.home.arpa
+https://dns.home.arpa
 ```
 
-Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. Caddy publishes HTTP only for now; HTTPS/TLS will be handled later.
+Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. The Technitium Web UI is published through Caddy over LAN-only HTTPS using Caddy's internal CA.
 
 ## `fritz.box`
 

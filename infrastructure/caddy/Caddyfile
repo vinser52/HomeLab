@@ -1,19 +1,24 @@
-http://dns.home.arpa {
+dns.home.arpa {
+    tls internal
     reverse_proxy technitium:5380
 }
 
-http://speedtest.home.arpa {
+speedtest.home.arpa {
+    tls internal
     reverse_proxy openspeedtest:3000
 }
 
-http://homepage.home.arpa {
+homepage.home.arpa {
+    tls internal
     reverse_proxy homepage:3000
 }
 
-http://glances.home.arpa {
+glances.home.arpa {
+    tls internal
     reverse_proxy glances:61208
 }
 
-http://status.home.arpa {
+status.home.arpa {
+    tls internal
     reverse_proxy uptime-kuma:3001
 }

@@ -13,7 +13,7 @@ The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpe
 | DHCP range | starts at `192.168.178.20` | Keeps infrastructure addresses outside the normal client range. |
 | Local domain | `home.arpa` | Local-only domain for HomeLab names. |
 | DNS service | Technitium DNS Server | Current implementation of the DNS service contract. |
-| HTTP reverse proxy | Caddy | Routes local HTTP service names such as `dns.home.arpa`. |
+| HTTP/HTTPS reverse proxy | Caddy | Routes local web service names such as `dns.home.arpa`. |
 | Dashboard | Homepage | Current implementation of `homepage.home.arpa`. |
 | Speed test | OpenSpeedTest | Current implementation of `speedtest.home.arpa`. |
 | Live monitoring | Glances | Current implementation of `glances.home.arpa`. |
@@ -32,6 +32,7 @@ HomeLab/
 |   |-- dns.md
 |   |-- networking.md
 |   |-- operations.md
+|   |-- tls.md
 |   `-- services.md
 |-- infrastructure/
 |   |-- caddy/
@@ -66,6 +67,8 @@ Runtime state is intentionally not committed. For example, Technitium data lives
 Homepage configuration lives under `applications/homepage/config/` and is committed to Git. Homepage intentionally contains no secrets; widgets requiring authentication should be added incrementally once a token strategy exists.
 
 Homepage gets live host metrics from Glances over the internal Docker network. Uptime Kuma monitors service availability and response time. Glances and Uptime Kuma are intentionally lightweight; Prometheus and Grafana are deferred until historical metrics, alerting, or long-term dashboards become necessary.
+
+Caddy provides LAN-only HTTPS using its internal CA. Browsers will warn until the Caddy root CA is trusted on each client device. See [TLS](docs/tls.md).
 
 ## Quick Start On The Server
 
@@ -103,36 +106,36 @@ docker compose logs --tail=100 uptime-kuma
 Open the Technitium Web UI through Caddy:
 
 ```text
-http://dns.home.arpa
+https://dns.home.arpa
 ```
 
 Open OpenSpeedTest through Caddy:
 
 ```text
-http://speedtest.home.arpa
+https://speedtest.home.arpa
 ```
 
 Open Homepage through Caddy:
 
 ```text
-http://homepage.home.arpa
+https://homepage.home.arpa
 ```
 
 Open Glances through Caddy:
 
 ```text
-http://glances.home.arpa
+https://glances.home.arpa
 ```
 
 Open Uptime Kuma through Caddy:
 
 ```text
-http://status.home.arpa
+https://status.home.arpa
 ```
 
 Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. DNS protocol traffic still goes directly to Technitium on `192.168.178.2:53/tcp` and `192.168.178.2:53/udp`.
 
-For now, Caddy serves HTTP only on port `80`. HTTPS/TLS will be added later as a separate step.
+Caddy publishes HTTP on port `80` and HTTPS on port `443`. HTTPS is preferred for HomeLab web services. TLS uses Caddy's internal CA, not Let's Encrypt.
 
 ## Validation
 
@@ -148,17 +151,23 @@ nslookup glances.home.arpa
 nslookup status.home.arpa
 ```
 
-HTTP tests from a Mac or LAN client:
+HTTPS tests from a Mac or LAN client before trusting the Caddy root CA:
 
 ```bash
-curl -I http://dns.home.arpa
-curl -I http://homepage.home.arpa
-curl -I http://speedtest.home.arpa
-curl -I http://glances.home.arpa
-curl -I http://status.home.arpa
+curl -k -I https://dns.home.arpa
+curl -k -I https://homepage.home.arpa
+curl -k -I https://speedtest.home.arpa
+curl -k -I https://glances.home.arpa
+curl -k -I https://status.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `80`, and the Web UIs are reachable through Caddy.
+After trusting the Caddy root CA:
+
+```bash
+curl -I https://homepage.home.arpa
+```
+
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Web UIs are reachable through Caddy.
 
 ## Documentation
 
@@ -167,6 +176,7 @@ Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `
 - [DNS](docs/dns.md)
 - [Operations](docs/operations.md)
 - [Services](docs/services.md)
+- [TLS](docs/tls.md)
 
 ## Local Configuration
 

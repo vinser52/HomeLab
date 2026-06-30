@@ -71,14 +71,14 @@ Caddy is the single HomeLab HTTP entrypoint. Application HTTP ports should not b
 
 Direct application port publishing is acceptable only for short-lived testing or troubleshooting, and should be removed once the service is routed through Caddy.
 
-For now, Caddy publishes HTTP only on port `80`. HTTPS/TLS will be handled later as a separate step.
+Caddy publishes HTTP on port `80` and HTTPS on port `443`. HTTPS is preferred for HomeLab web services and uses Caddy's internal CA.
 
 ## Homepage
 
 Homepage is reachable at:
 
 ```text
-http://homepage.home.arpa
+https://homepage.home.arpa
 ```
 
 Caddy routes `homepage.home.arpa` to the `homepage` Docker service on port `3000`. The Homepage container does not publish ports directly to the LAN and is reachable only through Caddy.
@@ -92,7 +92,7 @@ Homepage gets live host metrics from Glances over the internal Docker `proxy` ne
 OpenSpeedTest is reachable at:
 
 ```text
-http://speedtest.home.arpa
+https://speedtest.home.arpa
 ```
 
 Caddy routes `speedtest.home.arpa` to the `openspeedtest` Docker service on port `3000`. The OpenSpeedTest container does not publish ports directly to the LAN and is reachable only through Caddy.
@@ -102,7 +102,7 @@ Caddy routes `speedtest.home.arpa` to the `openspeedtest` Docker service on port
 Glances is reachable at:
 
 ```text
-http://glances.home.arpa
+https://glances.home.arpa
 ```
 
 Caddy routes `glances.home.arpa` to the `glances` Docker service on port `61208`. The Glances container does not publish ports directly to the LAN and is reachable only through Caddy.
@@ -114,7 +114,7 @@ Glances provides lightweight live monitoring for the HomeLab server. It is used 
 Uptime Kuma is reachable at:
 
 ```text
-http://status.home.arpa
+https://status.home.arpa
 ```
 
 Caddy routes `status.home.arpa` to the `uptime-kuma` Docker service on port `3001`. The Uptime Kuma container does not publish ports directly to the LAN and is reachable only through Caddy.
@@ -125,9 +125,9 @@ Initial monitors should be added manually through the Uptime Kuma UI:
 
 | Monitor | URL |
 | --- | --- |
-| Homepage | `http://homepage.home.arpa` |
-| DNS Web UI | `http://dns.home.arpa` |
-| OpenSpeedTest | `http://speedtest.home.arpa` |
-| Glances | `http://glances.home.arpa` |
+| Homepage | `https://homepage.home.arpa` |
+| DNS Web UI | `https://dns.home.arpa` |
+| OpenSpeedTest | `https://speedtest.home.arpa` |
+| Glances | `https://glances.home.arpa` |
 
-Use simple HTTP monitors. Notifications and public status pages are intentionally not configured yet.
+Use simple HTTP monitors with HTTPS URLs after TLS works and the Caddy root CA is trusted where needed. Notifications and public status pages are intentionally not configured yet.

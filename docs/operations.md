@@ -55,7 +55,7 @@ docker compose logs --tail=100 uptime-kuma
 
 ## Validation
 
-After deployment, validate DNS and HTTP routing from a Mac or LAN client.
+After deployment, validate DNS and HTTPS routing from a Mac or LAN client.
 
 DNS tests:
 
@@ -69,27 +69,35 @@ nslookup glances.home.arpa
 nslookup status.home.arpa
 ```
 
-HTTP tests:
+HTTPS tests before trusting the Caddy root CA:
 
 ```bash
-curl -I http://dns.home.arpa
-curl -I http://homepage.home.arpa
-curl -I http://speedtest.home.arpa
-curl -I http://glances.home.arpa
-curl -I http://status.home.arpa
+curl -k -I https://homepage.home.arpa
+curl -k -I https://dns.home.arpa
+curl -k -I https://speedtest.home.arpa
+curl -k -I https://glances.home.arpa
+curl -k -I https://status.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `80`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, and Uptime Kuma UI are reachable through Caddy.
+After trusting the Caddy root CA:
+
+```bash
+curl -I https://homepage.home.arpa
+```
+
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, and Uptime Kuma UI are reachable through Caddy.
 
 Direct access to `http://192.168.178.2:5380` is no longer expected. The Technitium Web UI is exposed only inside Docker and published through Caddy.
 
-OpenSpeedTest should be accessed through `http://speedtest.home.arpa`. It does not publish an HTTP port directly to the LAN.
+OpenSpeedTest should be accessed through `https://speedtest.home.arpa`. It does not publish an HTTP port directly to the LAN.
 
-Homepage should be accessed through `http://homepage.home.arpa`. It does not publish an HTTP port directly to the LAN. Its committed configuration lives under `applications/homepage/config/` and intentionally contains no secrets.
+Homepage should be accessed through `https://homepage.home.arpa`. It does not publish an HTTP port directly to the LAN. Its committed configuration lives under `applications/homepage/config/` and intentionally contains no secrets.
 
-Glances should be accessed through `http://glances.home.arpa`. It does not publish an HTTP port directly to the LAN. Homepage reads live host metrics from Glances over the internal Docker network.
+Glances should be accessed through `https://glances.home.arpa`. It does not publish an HTTP port directly to the LAN. Homepage reads live host metrics from Glances over the internal Docker network.
 
-Uptime Kuma should be accessed through `http://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `applications/uptime-kuma/data/`.
+Uptime Kuma should be accessed through `https://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `applications/uptime-kuma/data/`. Existing Uptime Kuma HTTP monitors should be changed to HTTPS after TLS works.
+
+See [TLS](tls.md) for Caddy root CA trust setup.
 
 ## `.env` Handling
 
@@ -125,6 +133,8 @@ Caddy stores runtime state under:
 infrastructure/caddy/data/
 infrastructure/caddy/config/
 ```
+
+Caddy also stores internal CA certificates and keys under `infrastructure/caddy/data/`. Do not commit this material to Git.
 
 Uptime Kuma stores monitor configuration and uptime history under:
 

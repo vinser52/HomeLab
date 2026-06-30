@@ -5,7 +5,7 @@ OpenSpeedTest is the current implementation for the `speedtest.home.arpa` servic
 Public URL:
 
 ```text
-http://speedtest.home.arpa
+https://speedtest.home.arpa
 ```
 
 The container does not publish HTTP ports directly to the LAN. Caddy reaches it over Docker networking at:

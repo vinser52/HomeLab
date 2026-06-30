@@ -6,8 +6,10 @@ services:
     depends_on:
       - technitium
     ports:
-      # HTTP only for now. HTTPS/TLS will be added as a separate step.
+      # HTTP remains published for compatibility and local troubleshooting.
       - "${HOMELAB_SERVER_IP:-192.168.178.2}:80:80/tcp"
+      # HTTPS is LAN-only and uses Caddy's internal CA.
+      - "${HOMELAB_SERVER_IP:-192.168.178.2}:443:443/tcp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data:/data
