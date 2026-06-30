@@ -1,9 +1,10 @@
 ---
-- Infrastructure:
+- HomeLab:
     - Homepage:
         href: https://homepage.home.arpa
         description: HomeLab landing page
         icon: homepage.png
+- Infrastructure:
     - DNS:
         href: https://dns.home.arpa
         description: Technitium DNS Server
@@ -22,10 +23,12 @@
         href: http://router.home.arpa
         description: FritzBox router
         icon: fritzbox.png
+- Utilities:
     - OpenSpeedTest:
         href: https://speedtest.home.arpa
         description: LAN speed testing
         icon: openspeedtest.png
+- Monitoring:
     - Glances:
         href: https://glances.home.arpa
         description: Live host monitoring
