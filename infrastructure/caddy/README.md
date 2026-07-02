@@ -21,4 +21,4 @@ https://status.home.arpa -> uptime-kuma:3001
 
 DNS protocol traffic on TCP/UDP port `53` continues to go directly to Technitium. Caddy only routes HTTP traffic such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, `jellyfin.home.arpa`, and future application names.
 
-Caddy's internal CA material lives under `infrastructure/caddy/data/`, which is runtime data and must not be committed.
+Caddy's internal CA material lives under `${HOMELAB_STATE_DIR}/caddy/data`, which is runtime data and must not be committed.

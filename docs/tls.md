@@ -16,19 +16,19 @@ Browsers and operating systems will warn until Caddy's root CA is trusted on eac
 Do not commit Caddy certificates, private keys, or CA material to Git. Caddy stores this runtime material under:
 
 ```text
-infrastructure/caddy/data/
+${HOMELAB_STATE_DIR}/caddy/data
 ```
 
 The expected root certificate path is:
 
 ```text
-infrastructure/caddy/data/caddy/pki/authorities/local/root.crt
+${HOMELAB_STATE_DIR}/caddy/data/caddy/pki/authorities/local/root.crt
 ```
 
 Find it on the HomeLab server with:
 
 ```bash
-find infrastructure/caddy/data -name root.crt
+find "${HOMELAB_STATE_DIR:-/homelab/state}/caddy/data" -name root.crt
 ```
 
 ## macOS Trust Setup

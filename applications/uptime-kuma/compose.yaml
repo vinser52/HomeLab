@@ -8,6 +8,6 @@ services:
       - "3001"
     volumes:
       # Uptime Kuma stores monitors, history, and status data here.
-      - ./data:/app/data
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/uptime-kuma/data:/app/data
     networks:
       - proxy

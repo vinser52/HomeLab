@@ -151,7 +151,16 @@ Applications belong under `applications/`.
 
 Every application should contain `compose.yaml` and `README.md`.
 
-Persistent runtime data belongs in local data directories. Runtime data must never be committed.
+Persistent runtime data belongs outside the Git repository. Runtime data must never be committed.
+
+## Runtime Data Layout
+
+- Git repository contains desired configuration only.
+- Runtime service state lives under `${HOMELAB_STATE_DIR}`.
+- User storage lives under `${HOMELAB_STORAGE_DIR}`.
+- Do not add persistent runtime bind mounts inside the Git repository.
+- Keep Git-managed static config in Git when it is truly desired configuration.
+- Use environment variables for host-specific base paths.
 
 ## Security Rules
 

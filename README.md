@@ -31,18 +31,19 @@ HomeLab/
 |   |-- architecture.md
 |   |-- dns.md
 |   |-- image-versioning.md
+|   |-- migration-runtime-state.md
 |   |-- networking.md
 |   |-- operations.md
-|   |-- tls.md
-|   `-- services.md
+|   |-- services.md
+|   |-- storage-layout.md
+|   `-- tls.md
 |-- infrastructure/
 |   |-- caddy/
 |   |   |-- Caddyfile
 |   |   |-- compose.yaml
 |   |   `-- README.md
 |   `-- technitium/
-|       |-- compose.yaml
-|       `-- data/
+|       `-- compose.yaml
 `-- applications/
     |-- glances/
     |   |-- compose.yaml
@@ -50,8 +51,7 @@ HomeLab/
     |   `-- config/
     |-- uptime-kuma/
     |   |-- compose.yaml
-    |   |-- README.md
-    |   `-- data/
+    |   `-- README.md
     |-- homepage/
     |   |-- compose.yaml
     |   |-- README.md
@@ -63,7 +63,7 @@ HomeLab/
 
 `infrastructure/` contains platform services such as DNS and the Caddy reverse proxy. `applications/` contains user-facing app stacks. Homepage is the dashboard application, OpenSpeedTest is the speed test application, Glances is the live monitoring application, and Uptime Kuma is the availability monitoring application.
 
-Runtime state is intentionally not committed. For example, Technitium data lives under `infrastructure/technitium/data/`, Caddy runtime data lives under `infrastructure/caddy/data/` and `infrastructure/caddy/config/`, Uptime Kuma data lives under `applications/uptime-kuma/data/`, and `.env` is local to each deployment.
+Runtime state is intentionally not committed and does not live inside the Git repository. Service state lives under `${HOMELAB_STATE_DIR}`, which defaults to `/homelab/state`. User storage lives under `${HOMELAB_STORAGE_DIR}`, which defaults to `/homelab/storage`. See [Storage Layout](docs/storage-layout.md).
 
 Homepage configuration lives under `applications/homepage/config/` and is committed to Git. Homepage intentionally contains no committed secrets; authenticated widgets use local `.env` placeholders so API tokens stay out of the repository.
 
@@ -178,6 +178,8 @@ Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `
 - [Image Versioning](docs/image-versioning.md)
 - [Operations](docs/operations.md)
 - [Services](docs/services.md)
+- [Storage Layout](docs/storage-layout.md)
+- [Runtime State Migration](docs/migration-runtime-state.md)
 - [TLS](docs/tls.md)
 
 ## Local Configuration
@@ -190,4 +192,6 @@ The current expected values are:
 FRITZBOX_ROUTER_IP=192.168.178.1
 HOMELAB_SERVER_IP=192.168.178.2
 LOCAL_DOMAIN=home.arpa
+HOMELAB_STATE_DIR=/homelab/state
+HOMELAB_STORAGE_DIR=/homelab/storage
 ```

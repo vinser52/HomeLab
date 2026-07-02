@@ -26,7 +26,7 @@ Uptime Kuma complements the other monitoring tools:
 Persistent data lives in:
 
 ```text
-applications/uptime-kuma/data/
+${HOMELAB_STATE_DIR}/uptime-kuma/data
 ```
 
 This directory contains Uptime Kuma configuration, monitor definitions, uptime history, and status data. It is intentionally ignored by Git because it is runtime state.

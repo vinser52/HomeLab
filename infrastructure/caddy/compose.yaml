@@ -12,7 +12,7 @@ services:
       - "${HOMELAB_SERVER_IP:-192.168.178.2}:443:443/tcp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./data:/data
-      - ./config:/config
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/caddy/data:/data
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/caddy/config:/config
     networks:
       - proxy

@@ -3,11 +3,14 @@
 .env.*
 !.env.example
 
-# Docker runtime data
+# Legacy in-repository runtime data from the pre-/homelab layout.
+# Keep ignored during migration, but new runtime state belongs under HOMELAB_STATE_DIR.
 infrastructure/technitium/data/
 infrastructure/caddy/data/
 infrastructure/caddy/config/
 applications/uptime-kuma/data/
+
+# Local runtime/log leftovers
 runtime/
 logs/
 */logs/

@@ -1,6 +1,6 @@
 # Architecture
 
-This HomeLab is organized around contracts first and implementations second. The repository describes the intended platform behavior, while `.env` and runtime data describe one specific deployment.
+This HomeLab is organized around contracts first and implementations second. The repository describes the intended platform behavior, while `.env`, `${HOMELAB_STATE_DIR}`, and `${HOMELAB_STORAGE_DIR}` describe one specific deployment.
 
 ## Layers
 
@@ -9,6 +9,7 @@ This HomeLab is organized around contracts first and implementations second. The
 | Environment | Physical network, router, DHCP, fixed leases, Wi-Fi, Ethernet. | FritzBox plus a fixed lease for the Ubuntu HomeLab server. |
 | Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, Caddy. |
 | Application | User-facing services. | Homepage, OpenSpeedTest, Glances, Uptime Kuma, future Jellyfin, Immich, Paperless, and similar apps. |
+| Runtime data | Service state and user storage outside Git. | `/homelab/state` and `/homelab/storage` by default. |
 
 ## Environment Layer
 
@@ -19,6 +20,8 @@ The HomeLab server should use Ethernet as its primary and preferred network inte
 ## Platform Layer
 
 Docker Compose is the deployment mechanism. The root `compose.yaml` includes platform and application compose files from subdirectories.
+
+Persistent service state is stored outside the Git repository under `${HOMELAB_STATE_DIR}`. User storage is stored separately under `${HOMELAB_STORAGE_DIR}`. Static desired configuration, such as the Caddyfile, Homepage YAML, and Glances config, stays in Git.
 
 Current platform service:
 

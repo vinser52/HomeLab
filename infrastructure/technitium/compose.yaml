@@ -19,8 +19,8 @@ services:
       DNS_SERVER_LOG_USING_LOCAL_TIME: "true"
       DNS_SERVER_LOG_FOLDER_PATH: /var/log/technitium/dns
     volumes:
-      - ./data/config:/etc/dns
-      - ./data/logs:/var/log/technitium/dns
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/technitium/config:/etc/dns
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/technitium/logs:/var/log/technitium/dns
     # Expands the ephemeral source port range to match the upstream example.
     sysctls:
       net.ipv4.ip_local_port_range: "1024 65535"

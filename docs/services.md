@@ -53,6 +53,20 @@ Current applications:
 | `applications/glances/` | Current implementation of `glances.home.arpa`. |
 | `applications/uptime-kuma/` | Current implementation of `status.home.arpa`. |
 
+## Runtime Data
+
+The repository contains desired configuration only. Persistent service state belongs under `${HOMELAB_STATE_DIR}`, which defaults to `/homelab/state`.
+
+Current state paths:
+
+| Service | State path |
+| --- | --- |
+| Caddy | `${HOMELAB_STATE_DIR}/caddy/` |
+| Technitium | `${HOMELAB_STATE_DIR}/technitium/` |
+| Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/` |
+
+User storage belongs under `${HOMELAB_STORAGE_DIR}`, which defaults to `/homelab/storage`. Future media applications such as Jellyfin should mount media from `${HOMELAB_STORAGE_DIR}/media`.
+
 ## Future Application Onboarding
 
 Planned flow for adding an application:
@@ -121,7 +135,7 @@ https://status.home.arpa
 
 Caddy routes `status.home.arpa` to the `uptime-kuma` Docker service on port `3001`. The Uptime Kuma container does not publish ports directly to the LAN and is reachable only through Caddy.
 
-Uptime Kuma monitors HomeLab service availability, response time, uptime history, and local status. Its configuration and history live under `applications/uptime-kuma/data/`, which is runtime data and intentionally ignored by Git.
+Uptime Kuma monitors HomeLab service availability, response time, uptime history, and local status. Its configuration and history live under `${HOMELAB_STATE_DIR}/uptime-kuma/data`, which is runtime data and intentionally ignored by Git.
 
 Initial monitors should be added manually through the Uptime Kuma UI:
 

@@ -95,7 +95,7 @@ Homepage should be accessed through `https://homepage.home.arpa`. It does not pu
 
 Glances should be accessed through `https://glances.home.arpa`. It does not publish an HTTP port directly to the LAN. Homepage reads live host metrics from Glances over the internal Docker network.
 
-Uptime Kuma should be accessed through `https://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `applications/uptime-kuma/data/`. Existing Uptime Kuma HTTP monitors should be changed to HTTPS after TLS works.
+Uptime Kuma should be accessed through `https://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `${HOMELAB_STATE_DIR}/uptime-kuma/data`.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 
@@ -119,28 +119,40 @@ Rules:
 
 For the current HomeLab stage, a protected `.env` file is acceptable. If secret handling becomes more complex, consider Docker secrets, SOPS with age, or Vault-like tools.
 
+`.env` also defines host-specific base paths:
+
+```env
+HOMELAB_STATE_DIR=/homelab/state
+HOMELAB_STORAGE_DIR=/homelab/storage
+```
+
 ## Runtime Data
 
-Runtime data is intentionally ignored by Git. Technitium stores configuration and logs under:
+Runtime data is intentionally outside the Git repository. Service state lives under `${HOMELAB_STATE_DIR}`.
+
+Technitium stores configuration and logs under:
 
 ```text
-infrastructure/technitium/data/
+${HOMELAB_STATE_DIR}/technitium/config
+${HOMELAB_STATE_DIR}/technitium/logs
 ```
 
 Caddy stores runtime state under:
 
 ```text
-infrastructure/caddy/data/
-infrastructure/caddy/config/
+${HOMELAB_STATE_DIR}/caddy/data
+${HOMELAB_STATE_DIR}/caddy/config
 ```
 
-Caddy also stores internal CA certificates and keys under `infrastructure/caddy/data/`. Do not commit this material to Git.
+Caddy also stores internal CA certificates and keys under `${HOMELAB_STATE_DIR}/caddy/data`. Do not commit this material to Git.
 
 Uptime Kuma stores monitor configuration and uptime history under:
 
 ```text
-applications/uptime-kuma/data/
+${HOMELAB_STATE_DIR}/uptime-kuma/data
 ```
+
+User storage belongs under `${HOMELAB_STORAGE_DIR}` and is separate from service state. See [Storage Layout](storage-layout.md) and [Runtime State Migration](migration-runtime-state.md).
 
 Back up runtime data before destructive maintenance once the DNS service becomes important for daily use.
 
@@ -150,7 +162,7 @@ During early experiments, it can be useful to wipe Technitium and start fresh:
 
 ```bash
 docker compose down
-sudo rm -rf infrastructure/technitium/data
+sudo rm -rf "${HOMELAB_STATE_DIR:-/homelab/state}/technitium"
 docker compose up -d
 ```
 
