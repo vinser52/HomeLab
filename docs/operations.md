@@ -26,6 +26,7 @@ docker compose logs --tail=100 homepage
 docker compose logs --tail=100 openspeedtest
 docker compose logs --tail=100 glances
 docker compose logs --tail=100 uptime-kuma
+docker compose logs --tail=100 jellyfin
 ```
 
 Git is the source of truth for intended configuration. Runtime data and local secrets stay outside Git.
@@ -51,6 +52,7 @@ docker compose logs --tail=100 homepage
 docker compose logs --tail=100 openspeedtest
 docker compose logs --tail=100 glances
 docker compose logs --tail=100 uptime-kuma
+docker compose logs --tail=100 jellyfin
 ```
 
 ## Validation
@@ -67,6 +69,7 @@ nslookup homepage.home.arpa
 nslookup speedtest.home.arpa
 nslookup glances.home.arpa
 nslookup status.home.arpa
+nslookup jellyfin.home.arpa
 ```
 
 HTTPS tests before trusting the Caddy root CA:
@@ -77,6 +80,7 @@ curl -k -I https://dns.home.arpa
 curl -k -I https://speedtest.home.arpa
 curl -k -I https://glances.home.arpa
 curl -k -I https://status.home.arpa
+curl -k -I https://jellyfin.home.arpa
 ```
 
 After trusting the Caddy root CA:
@@ -85,7 +89,7 @@ After trusting the Caddy root CA:
 curl -I https://homepage.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, and Uptime Kuma UI are reachable through Caddy.
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, and `jellyfin.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, Uptime Kuma UI, and Jellyfin UI are reachable through Caddy.
 
 Direct access to `http://192.168.178.2:5380` is no longer expected. The Technitium Web UI is exposed only inside Docker and published through Caddy.
 
@@ -96,6 +100,8 @@ Homepage should be accessed through `https://homepage.home.arpa`. It does not pu
 Glances should be accessed through `https://glances.home.arpa`. It does not publish an HTTP port directly to the LAN. Homepage reads live host metrics from Glances over the internal Docker network.
 
 Uptime Kuma should be accessed through `https://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `${HOMELAB_STATE_DIR}/uptime-kuma/data`.
+
+Jellyfin should be accessed through `https://jellyfin.home.arpa`. It does not publish port `8096` directly to the LAN. Its runtime state lives under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`, while media stays under `${HOMELAB_STORAGE_DIR}/media`.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 
@@ -150,6 +156,13 @@ Uptime Kuma stores monitor configuration and uptime history under:
 
 ```text
 ${HOMELAB_STATE_DIR}/uptime-kuma/data
+```
+
+Jellyfin stores application state under:
+
+```text
+${HOMELAB_STATE_DIR}/jellyfin/config
+${HOMELAB_STATE_DIR}/jellyfin/cache
 ```
 
 User storage belongs under `${HOMELAB_STORAGE_DIR}` and is separate from service state. See [Storage Layout](storage-layout.md) and [Runtime State Migration](migration-runtime-state.md).

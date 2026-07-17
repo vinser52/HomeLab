@@ -25,14 +25,14 @@ These paths are host-specific and are configured through `.env`.
 /homelab
 |-- state
 |   |-- caddy
+|   |-- jellyfin
 |   |-- technitium
 |   |-- uptime-kuma
-|   `-- jellyfin
+|   `-- ...
 `-- storage
     |-- media
     |   |-- Movies
-    |   |-- TV
-    |   `-- Music
+    |   `-- Series
     |-- photos
     |-- documents
     `-- backups
@@ -45,15 +45,16 @@ These paths are host-specific and are configured through `.env`.
 | Caddy | `${HOMELAB_STATE_DIR}/caddy/data`, `${HOMELAB_STATE_DIR}/caddy/config` |
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/config`, `${HOMELAB_STATE_DIR}/technitium/logs` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/data` |
+| Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/config`, `${HOMELAB_STATE_DIR}/jellyfin/cache` |
 | Homepage | Git-managed YAML in `applications/homepage/config/` |
 | Glances | Git-managed config in `applications/glances/config/glances.conf` |
 | OpenSpeedTest | No persistent state |
 
 Homepage and Glances keep static configuration in Git because those files describe desired configuration, not runtime state.
 
-## Future Jellyfin Layout
+## Jellyfin Layout
 
-Jellyfin is not currently deployed. If it is added later, use this layout:
+Jellyfin uses this layout:
 
 ```yaml
 volumes:

@@ -8,7 +8,7 @@ This HomeLab is organized around contracts first and implementations second. The
 | --- | --- | --- |
 | Environment | Physical network, router, DHCP, fixed leases, Wi-Fi, Ethernet. | FritzBox plus a fixed lease for the Ubuntu HomeLab server. |
 | Platform | Shared services that applications rely on. | Docker Compose, Technitium DNS Server, Caddy. |
-| Application | User-facing services. | Homepage, OpenSpeedTest, Glances, Uptime Kuma, future Jellyfin, Immich, Paperless, and similar apps. |
+| Application | User-facing services. | Homepage, OpenSpeedTest, Glances, Uptime Kuma, Jellyfin, future Immich, Paperless, and similar apps. |
 | Runtime data | Service state and user storage outside Git. | `/homelab/state` and `/homelab/storage` by default. |
 
 ## Environment Layer
@@ -44,6 +44,7 @@ Current application service:
 | `speedtest.home.arpa` | OpenSpeedTest | `applications/openspeedtest/` |
 | `glances.home.arpa` | Glances | `applications/glances/` |
 | `status.home.arpa` | Uptime Kuma | `applications/uptime-kuma/` |
+| `jellyfin.home.arpa` | Jellyfin | `applications/jellyfin/` |
 
 ## Contracts Over Implementations
 
@@ -89,7 +90,7 @@ Caddy is the HomeLab HTTP/HTTPS reverse proxy. It routes names such as `dns.home
 
 Caddy does not proxy DNS protocol traffic. DNS uses TCP/UDP port `53`, not HTTP/HTTPS, so DNS clients must reach the DNS service directly on the HomeLab server. Only Web UIs and application HTTP/HTTPS traffic belong behind Caddy.
 
-The first infrastructure Web UI behind Caddy is Technitium at `https://dns.home.arpa`. Homepage is available at `https://homepage.home.arpa`, OpenSpeedTest is available at `https://speedtest.home.arpa`, Glances is available at `https://glances.home.arpa`, and Uptime Kuma is available at `https://status.home.arpa`.
+The first infrastructure Web UI behind Caddy is Technitium at `https://dns.home.arpa`. Homepage is available at `https://homepage.home.arpa`, OpenSpeedTest is available at `https://speedtest.home.arpa`, Glances is available at `https://glances.home.arpa`, Uptime Kuma is available at `https://status.home.arpa`, and Jellyfin is available at `https://jellyfin.home.arpa`.
 
 Caddy publishes HTTP on `192.168.178.2:80/tcp` and HTTPS on `192.168.178.2:443/tcp`. HTTPS uses Caddy's internal CA for LAN-only TLS. No public CA, Let's Encrypt, or Internet exposure is involved.
 

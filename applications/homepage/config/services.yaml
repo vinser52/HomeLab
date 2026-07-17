@@ -23,6 +23,11 @@
         href: http://router.home.arpa
         description: FritzBox router
         icon: fritzbox.png
+- Media:
+    - Jellyfin:
+        href: https://jellyfin.home.arpa
+        description: Media streaming
+        icon: jellyfin.png
 - Utilities:
     - OpenSpeedTest:
         href: https://speedtest.home.arpa

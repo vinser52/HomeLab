@@ -17,6 +17,7 @@ https://homepage.home.arpa -> homepage:3000
 https://speedtest.home.arpa -> openspeedtest:3000
 https://glances.home.arpa -> glances:61208
 https://status.home.arpa -> uptime-kuma:3001
+https://jellyfin.home.arpa -> jellyfin:8096
 ```
 
 DNS protocol traffic on TCP/UDP port `53` continues to go directly to Technitium. Caddy only routes HTTP traffic such as `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, `jellyfin.home.arpa`, and future application names.

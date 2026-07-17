@@ -2,7 +2,7 @@
 
 This repository is the source of truth for a Docker Compose based HomeLab. It is developed and deployed to a home Ubuntu server via Git, and currently runs infrastructure services for the local network.
 
-The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, and Uptime Kuma. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, and Uptime Kuma tracks service availability.
+The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, Uptime Kuma, and Jellyfin. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, Uptime Kuma tracks service availability, and Jellyfin provides local media streaming.
 
 ## Current Environment
 
@@ -18,6 +18,7 @@ The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpe
 | Speed test | OpenSpeedTest | Current implementation of `speedtest.home.arpa`. |
 | Live monitoring | Glances | Current implementation of `glances.home.arpa`. |
 | Availability monitoring | Uptime Kuma | Current implementation of `status.home.arpa`. |
+| Media streaming | Jellyfin | Current implementation of `jellyfin.home.arpa`. |
 
 ## Repository Structure
 
@@ -52,6 +53,9 @@ HomeLab/
     |-- uptime-kuma/
     |   |-- compose.yaml
     |   `-- README.md
+    |-- jellyfin/
+    |   |-- compose.yaml
+    |   `-- README.md
     |-- homepage/
     |   |-- compose.yaml
     |   |-- README.md
@@ -61,7 +65,7 @@ HomeLab/
         `-- README.md
 ```
 
-`infrastructure/` contains platform services such as DNS and the Caddy reverse proxy. `applications/` contains user-facing app stacks. Homepage is the dashboard application, OpenSpeedTest is the speed test application, Glances is the live monitoring application, and Uptime Kuma is the availability monitoring application.
+`infrastructure/` contains platform services such as DNS and the Caddy reverse proxy. `applications/` contains user-facing app stacks. Homepage is the dashboard application, OpenSpeedTest is the speed test application, Glances is the live monitoring application, Uptime Kuma is the availability monitoring application, and Jellyfin is the media streaming application.
 
 Runtime state is intentionally not committed and does not live inside the Git repository. Service state lives under `${HOMELAB_STATE_DIR}`, which defaults to `/homelab/state`. User storage lives under `${HOMELAB_STORAGE_DIR}`, which defaults to `/homelab/storage`. See [Storage Layout](docs/storage-layout.md).
 
@@ -102,6 +106,7 @@ docker compose logs --tail=100 homepage
 docker compose logs --tail=100 openspeedtest
 docker compose logs --tail=100 glances
 docker compose logs --tail=100 uptime-kuma
+docker compose logs --tail=100 jellyfin
 ```
 
 Open the Technitium Web UI through Caddy:
@@ -134,6 +139,12 @@ Open Uptime Kuma through Caddy:
 https://status.home.arpa
 ```
 
+Open Jellyfin through Caddy:
+
+```text
+https://jellyfin.home.arpa
+```
+
 Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is running. DNS protocol traffic still goes directly to Technitium on `192.168.178.2:53/tcp` and `192.168.178.2:53/udp`.
 
 Caddy publishes HTTP on port `80` and HTTPS on port `443`. HTTPS is preferred for HomeLab web services. TLS uses Caddy's internal CA, not Let's Encrypt.
@@ -150,6 +161,7 @@ nslookup homepage.home.arpa
 nslookup speedtest.home.arpa
 nslookup glances.home.arpa
 nslookup status.home.arpa
+nslookup jellyfin.home.arpa
 ```
 
 HTTPS tests from a Mac or LAN client before trusting the Caddy root CA:
@@ -160,6 +172,7 @@ curl -k -I https://homepage.home.arpa
 curl -k -I https://speedtest.home.arpa
 curl -k -I https://glances.home.arpa
 curl -k -I https://status.home.arpa
+curl -k -I https://jellyfin.home.arpa
 ```
 
 After trusting the Caddy root CA:
@@ -168,7 +181,7 @@ After trusting the Caddy root CA:
 curl -I https://homepage.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, and `status.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Web UIs are reachable through Caddy.
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, and `jellyfin.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Web UIs are reachable through Caddy.
 
 ## Documentation
 
@@ -194,4 +207,8 @@ HOMELAB_SERVER_IP=192.168.178.2
 LOCAL_DOMAIN=home.arpa
 HOMELAB_STATE_DIR=/homelab/state
 HOMELAB_STORAGE_DIR=/homelab/storage
+HOMELAB_UID=1000
+HOMELAB_GID=1000
+JELLYFIN_VIDEO_GID=44
+JELLYFIN_RENDER_GID=109
 ```

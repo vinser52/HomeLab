@@ -30,6 +30,8 @@ Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts,
 
 `status.home.arpa` is the stable public contract for service availability monitoring. Uptime Kuma is the current implementation and can be replaced later without changing the client-facing URL.
 
+`jellyfin.home.arpa` is the stable public contract for local media streaming. Jellyfin is the current implementation and can be replaced later without changing the client-facing URL.
+
 ## Folder Convention
 
 | Path | Purpose |
@@ -52,6 +54,7 @@ Current applications:
 | `applications/openspeedtest/` | Current implementation of `speedtest.home.arpa`. |
 | `applications/glances/` | Current implementation of `glances.home.arpa`. |
 | `applications/uptime-kuma/` | Current implementation of `status.home.arpa`. |
+| `applications/jellyfin/` | Current implementation of `jellyfin.home.arpa`. |
 
 ## Runtime Data
 
@@ -64,6 +67,7 @@ Current state paths:
 | Caddy | `${HOMELAB_STATE_DIR}/caddy/` |
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/` |
+| Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/` |
 
 User storage belongs under `${HOMELAB_STORAGE_DIR}`, which defaults to `/homelab/storage`. Future media applications such as Jellyfin should mount media from `${HOMELAB_STORAGE_DIR}/media`.
 
@@ -147,3 +151,15 @@ Initial monitors should be added manually through the Uptime Kuma UI:
 | Glances | `https://glances.home.arpa` |
 
 Use simple HTTP monitors with HTTPS URLs after TLS works and the Caddy root CA is trusted where needed. Notifications and public status pages are intentionally not configured yet.
+
+## Jellyfin
+
+Jellyfin is reachable at:
+
+```text
+https://jellyfin.home.arpa
+```
+
+Caddy routes `jellyfin.home.arpa` to the `jellyfin` Docker service on port `8096`. The Jellyfin container does not publish port `8096` directly to the LAN and is reachable only through Caddy.
+
+Jellyfin stores runtime state under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`. It mounts media read-only from `${HOMELAB_STORAGE_DIR}/media` so the existing `Movies` and `Series` layout remains the source of truth.

@@ -1,0 +1,23 @@
+services:
+  jellyfin:
+    image: docker.io/jellyfin/jellyfin:10.11.0
+    container_name: jellyfin
+    restart: unless-stopped
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    group_add:
+      - "${JELLYFIN_VIDEO_GID}"
+      - "${JELLYFIN_RENDER_GID}"
+    expose:
+      # Jellyfin serves HTTP on port 8096 inside the container.
+      - "8096"
+    devices:
+      # Expose the Intel GPU for Quick Sync or VA-API transcoding.
+      - /dev/dri:/dev/dri
+    volumes:
+      # Jellyfin runtime state lives outside Git under the HomeLab state directory.
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/jellyfin/config:/config
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/jellyfin/cache:/cache
+      # Existing media storage is mounted read-only.
+      - ${HOMELAB_STORAGE_DIR:-/homelab/storage}/media:/media:ro
+    networks:
+      - proxy

@@ -22,3 +22,8 @@ status.home.arpa {
     tls internal
     reverse_proxy uptime-kuma:3001
 }
+
+jellyfin.home.arpa {
+    tls internal
+    reverse_proxy jellyfin:8096
+}
