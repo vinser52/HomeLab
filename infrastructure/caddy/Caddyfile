@@ -23,6 +23,10 @@ status.home.arpa {
     reverse_proxy uptime-kuma:3001
 }
 
+http://jellyfin-tv.home.arpa {
+    reverse_proxy jellyfin:8096
+}
+
 jellyfin.home.arpa {
     tls internal
     reverse_proxy jellyfin:8096
