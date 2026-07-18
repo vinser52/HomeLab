@@ -359,10 +359,10 @@ def apply_operations(
                 f"{operation.source}"
             )
 
-        print(f"Moving: {operation.source.name}")
+        print(f"Copying: {operation.source.name}")
         print(f"     -> {operation.destination.name}")
 
-        shutil.move(
+        shutil.copy2(
             str(operation.source),
             str(operation.destination),
         )
@@ -491,7 +491,7 @@ def organize(args: argparse.Namespace) -> int:
 
     print()
     print(
-        f"Done. Moved and verified "
+        f"Done. Copied and verified "
         f"{len(operations)} files."
     )
     print(f"Destination: {destination_dir}")
