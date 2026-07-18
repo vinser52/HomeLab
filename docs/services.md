@@ -32,6 +32,8 @@ Machine names such as `homelab-server.home.arpa` belong to infrastructure hosts,
 
 `jellyfin.home.arpa` is the stable public contract for local media streaming. Jellyfin is the current implementation and can be replaced later without changing the client-facing URL.
 
+`grafana.home.arpa` is the stable public contract for historical HomeLab metrics dashboards. Grafana is the current UI implementation. Prometheus and node-exporter are internal implementation details and are not exposed directly to the LAN.
+
 ## Folder Convention
 
 | Path | Purpose |
@@ -55,6 +57,7 @@ Current applications:
 | `applications/glances/` | Current implementation of `glances.home.arpa`. |
 | `applications/uptime-kuma/` | Current implementation of `status.home.arpa`. |
 | `applications/jellyfin/` | Current implementation of `jellyfin.home.arpa`. |
+| `applications/monitoring/` | Current implementation of `grafana.home.arpa` and historical host metrics. |
 
 ## Runtime Data
 
@@ -68,6 +71,8 @@ Current state paths:
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/` |
 | Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/` |
+| Grafana | `${HOMELAB_STATE_DIR}/grafana/` |
+| Prometheus | `${HOMELAB_STATE_DIR}/prometheus/` |
 
 User storage belongs under `${HOMELAB_STORAGE_DIR}`, which defaults to `/homelab/storage`. Future media applications such as Jellyfin should mount media from `${HOMELAB_STORAGE_DIR}/media`.
 
@@ -163,3 +168,21 @@ https://jellyfin.home.arpa
 Caddy routes `jellyfin.home.arpa` to the `jellyfin` Docker service on port `8096`. The Jellyfin container does not publish port `8096` directly to the LAN and is reachable only through Caddy.
 
 Jellyfin stores runtime state under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`. It mounts media read-only from `${HOMELAB_STORAGE_DIR}/media` so the existing `Movies` and `Series` layout remains the source of truth.
+
+## Monitoring
+
+Grafana is reachable at:
+
+```text
+https://grafana.home.arpa
+```
+
+Caddy routes `grafana.home.arpa` to the `grafana` Docker service on port `3000`. Grafana does not publish port `3000` directly to the LAN and is reachable only through Caddy.
+
+Prometheus and node-exporter stay internal on the Docker `proxy` network. Prometheus scrapes itself at `prometheus:9090` and node-exporter at `node-exporter:9100`. Grafana reads Prometheus at `http://prometheus:9090`.
+
+Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with an initial retention period of 15 days.
+
+Desired monitoring configuration lives in Git under `applications/monitoring/config/`. Grafana provisioning creates the Prometheus datasource and loads committed dashboards. Dashboards created through the Grafana UI live in Grafana runtime state unless they are exported and committed.
+
+node-exporter is configured to report Ubuntu host metrics while running as a container. It uses host PID visibility, mounts the host root filesystem read-only at `/host`, uses `--path.rootfs=/host`, and excludes pseudo-filesystems, Docker overlay mounts, and container runtime paths from filesystem metrics. It does not use `privileged: true`, host networking, or the Docker socket.

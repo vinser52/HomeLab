@@ -1,0 +1,62 @@
+services:
+  grafana:
+    image: docker.io/grafana/grafana:12.1.0
+    container_name: grafana
+    restart: unless-stopped
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    expose:
+      # Grafana serves HTTP on port 3000 inside the container.
+      - "3000"
+    environment:
+      GF_SERVER_DOMAIN: grafana.home.arpa
+      GF_SERVER_ROOT_URL: https://grafana.home.arpa
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      # Grafana runtime state lives outside Git under the HomeLab state directory.
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/grafana/data:/var/lib/grafana
+      # Desired datasources and dashboards are provisioned from Git-managed config.
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - proxy
+
+  prometheus:
+    image: docker.io/prom/prometheus:v3.5.0
+    container_name: prometheus
+    restart: unless-stopped
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    expose:
+      # Prometheus stays internal and is used by Grafana over Docker networking.
+      - "9090"
+    volumes:
+      - ./config/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data:/prometheus
+    networks:
+      - proxy
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
+    # Host PID visibility helps node-exporter report host process namespace metrics.
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run|var/lib/docker/.+)($|/)
+      - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+    expose:
+      # node-exporter stays internal and is scraped only by Prometheus.
+      - "9100"
+    volumes:
+      # Read-only host root lets node-exporter report Ubuntu host metrics.
+      - /:/host:ro,rslave
+    networks:
+      - proxy

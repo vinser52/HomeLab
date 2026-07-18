@@ -46,3 +46,7 @@
           type: uptimekuma
           url: http://uptime-kuma:3001
           slug: "{{HOMEPAGE_VAR_UPTIME_KUMA_STATUS_SLUG}}"
+    - Grafana:
+        href: https://grafana.home.arpa
+        description: Historical metrics dashboards
+        icon: grafana.png

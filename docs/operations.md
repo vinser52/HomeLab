@@ -27,6 +27,9 @@ docker compose logs --tail=100 openspeedtest
 docker compose logs --tail=100 glances
 docker compose logs --tail=100 uptime-kuma
 docker compose logs --tail=100 jellyfin
+docker compose logs --tail=100 grafana
+docker compose logs --tail=100 prometheus
+docker compose logs --tail=100 node-exporter
 ```
 
 Git is the source of truth for intended configuration. Runtime data and local secrets stay outside Git.
@@ -53,6 +56,9 @@ docker compose logs --tail=100 openspeedtest
 docker compose logs --tail=100 glances
 docker compose logs --tail=100 uptime-kuma
 docker compose logs --tail=100 jellyfin
+docker compose logs --tail=100 grafana
+docker compose logs --tail=100 prometheus
+docker compose logs --tail=100 node-exporter
 ```
 
 ## Validation
@@ -70,6 +76,7 @@ nslookup speedtest.home.arpa
 nslookup glances.home.arpa
 nslookup status.home.arpa
 nslookup jellyfin.home.arpa
+nslookup grafana.home.arpa
 ```
 
 HTTPS tests before trusting the Caddy root CA:
@@ -81,6 +88,7 @@ curl -k -I https://speedtest.home.arpa
 curl -k -I https://glances.home.arpa
 curl -k -I https://status.home.arpa
 curl -k -I https://jellyfin.home.arpa
+curl -k -I https://grafana.home.arpa
 ```
 
 After trusting the Caddy root CA:
@@ -89,7 +97,7 @@ After trusting the Caddy root CA:
 curl -I https://homepage.home.arpa
 ```
 
-Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, and `jellyfin.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, Uptime Kuma UI, and Jellyfin UI are reachable through Caddy.
+Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `glances.home.arpa`, `status.home.arpa`, `jellyfin.home.arpa`, and `grafana.home.arpa` resolve to `192.168.178.2`, Caddy answers on port `443`, and the Technitium Web UI, Homepage UI, OpenSpeedTest UI, Glances UI, Uptime Kuma UI, Jellyfin UI, and Grafana UI are reachable through Caddy.
 
 Direct access to `http://192.168.178.2:5380` is no longer expected. The Technitium Web UI is exposed only inside Docker and published through Caddy.
 
@@ -102,6 +110,16 @@ Glances should be accessed through `https://glances.home.arpa`. It does not publ
 Uptime Kuma should be accessed through `https://status.home.arpa`. It does not publish an HTTP port directly to the LAN. Its monitor configuration and uptime history live under `${HOMELAB_STATE_DIR}/uptime-kuma/data`.
 
 Jellyfin should be accessed through `https://jellyfin.home.arpa`. It does not publish port `8096` directly to the LAN. Its runtime state lives under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`, while media stays under `${HOMELAB_STORAGE_DIR}/media`.
+
+Grafana should be accessed through `https://grafana.home.arpa`. It does not publish port `3000` directly to the LAN. Prometheus and node-exporter are internal-only services and do not publish ports directly to the LAN. Grafana runtime state lives under `${HOMELAB_STATE_DIR}/grafana/data`; Prometheus metrics data lives under `${HOMELAB_STATE_DIR}/prometheus/data`.
+
+Monitoring runtime checks should be run on the Ubuntu HomeLab server, not on the MacBook:
+
+```bash
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
+```
+
+In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, and load metrics. The `up{job="node-exporter"}` query should return `1`, and filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, or Docker runtime paths.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 
@@ -163,6 +181,13 @@ Jellyfin stores application state under:
 ```text
 ${HOMELAB_STATE_DIR}/jellyfin/config
 ${HOMELAB_STATE_DIR}/jellyfin/cache
+```
+
+Grafana and Prometheus store state under:
+
+```text
+${HOMELAB_STATE_DIR}/grafana/data
+${HOMELAB_STATE_DIR}/prometheus/data
 ```
 
 User storage belongs under `${HOMELAB_STORAGE_DIR}` and is separate from service state. See [Storage Layout](storage-layout.md) and [Runtime State Migration](migration-runtime-state.md).

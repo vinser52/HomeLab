@@ -46,11 +46,13 @@ These paths are host-specific and are configured through `.env`.
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/config`, `${HOMELAB_STATE_DIR}/technitium/logs` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/data` |
 | Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/config`, `${HOMELAB_STATE_DIR}/jellyfin/cache` |
+| Grafana | `${HOMELAB_STATE_DIR}/grafana/data` |
+| Prometheus | `${HOMELAB_STATE_DIR}/prometheus/data` |
 | Homepage | Git-managed YAML in `applications/homepage/config/` |
 | Glances | Git-managed config in `applications/glances/config/glances.conf` |
 | OpenSpeedTest | No persistent state |
 
-Homepage and Glances keep static configuration in Git because those files describe desired configuration, not runtime state.
+Homepage, Glances, Prometheus, and Grafana provisioning keep static configuration in Git because those files describe desired configuration, not runtime state. Grafana dashboards created in the UI live in Grafana runtime state unless they are exported and committed under `applications/monitoring/config/grafana/dashboards/`.
 
 ## Jellyfin Layout
 
