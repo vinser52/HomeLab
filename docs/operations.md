@@ -140,7 +140,7 @@ Monitoring runtime checks should be run on the Ubuntu HomeLab server, not on the
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 ```
 
-In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, and load metrics. The `up{job="node-exporter"}` query should return `1`, and filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, Ubuntu Snap mounts, or Docker runtime paths.
+In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, load, and network metrics. The `up{job="node-exporter"}` query should return `1`; filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, Ubuntu Snap mounts, or Docker runtime paths; and network panels should focus on physical host interfaces rather than `lo`, Docker bridges, or `veth` devices.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 

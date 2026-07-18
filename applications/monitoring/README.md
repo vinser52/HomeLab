@@ -102,6 +102,7 @@ node_uname_info
 node_memory_MemAvailable_bytes
 rate(node_cpu_seconds_total[5m])
 node_filesystem_avail_bytes
+rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter target as up, and the `Host Metrics Overview` dashboard shows Ubuntu host CPU, memory, filesystem, and load metrics without noisy container filesystems dominating the view.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter target as up, and the `Host Metrics Overview` dashboard shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view.
