@@ -179,12 +179,12 @@ https://grafana.home.arpa
 
 Caddy routes `grafana.home.arpa` to the `grafana` Docker service on port `3000`. Grafana does not publish port `3000` directly to the LAN and is reachable only through Caddy.
 
-Prometheus and node-exporter stay internal on the Docker `proxy` network. Prometheus scrapes itself at `prometheus:9090` and node-exporter at `node-exporter:9100`. Grafana reads Prometheus at `http://prometheus:9090`.
+Prometheus stays internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
 
 Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with an initial retention period of 15 days.
 
 Desired monitoring configuration lives in Git under `applications/monitoring/config/`. Grafana provisioning creates the Prometheus datasource and loads committed dashboards. Dashboards created through the Grafana UI live in Grafana runtime state unless they are exported and committed.
 
-node-exporter is configured to report Ubuntu host metrics while running as a container. It uses host PID visibility, mounts the host root filesystem read-only at `/host`, uses `--path.rootfs=/host`, and excludes pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths from filesystem metrics. It does not use `privileged: true`, host networking, or the Docker socket.
+node-exporter is configured to report Ubuntu host metrics while running as a container. It uses host network and PID visibility, mounts the host root filesystem read-only at `/host`, uses `--path.rootfs=/host`, and excludes pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths from filesystem metrics. It does not use `privileged: true` or the Docker socket. Host networking is intentionally allowed only for node-exporter because Linux network counters are network-namespace scoped; without it, the network dashboard shows the container interface instead of the host NIC.
 
 The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, load, network throughput, packet rate, network errors and drops, and interface state. Network panels filter out loopback, Docker bridge, and `veth` interfaces in PromQL so the default dashboard focuses on physical host networking while preserving the raw metrics for future troubleshooting.

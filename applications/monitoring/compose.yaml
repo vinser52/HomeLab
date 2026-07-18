@@ -46,17 +46,13 @@ services:
     image: quay.io/prometheus/node-exporter:v1.9.1
     container_name: node-exporter
     restart: unless-stopped
-    # Host PID visibility helps node-exporter report host process namespace metrics.
+    # Host network and PID visibility are required for accurate host-level metrics.
+    network_mode: host
     pid: host
     command:
       - --path.rootfs=/host
       - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run|var/lib/docker/.+|var/lib/snapd/.+|var/snap/.+|snap/.+)($|/)
       - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
-    expose:
-      # node-exporter stays internal and is scraped only by Prometheus.
-      - "9100"
     volumes:
       # Read-only host root lets node-exporter report Ubuntu host metrics.
       - /:/host:ro,rslave
-    networks:
-      - proxy

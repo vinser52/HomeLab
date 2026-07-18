@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus and node-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN.
+Only Grafana is exposed through Caddy. Prometheus stays internal on the Docker `proxy` network and does not publish ports directly to the LAN. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -16,7 +16,7 @@ Only Grafana is exposed through Caddy. Prometheus and node-exporter stay interna
 | --- | --- | --- |
 | Grafana | Dashboards and metrics UI | `grafana:3000` |
 | Prometheus | Metrics database and scraper | `prometheus:9090` |
-| node-exporter | Ubuntu host metrics exporter | `node-exporter:9100` |
+| node-exporter | Ubuntu host metrics exporter | `homelab-server.home.arpa:9100` |
 
 ## Runtime Data
 
@@ -60,13 +60,13 @@ Grafana provisioning config creates the Prometheus datasource and loads committe
 
 ## Host Metrics
 
-node-exporter runs in a container but reports Ubuntu host metrics by using host PID visibility, mounting the host root filesystem read-only at `/host`, and using:
+node-exporter runs in a container but reports Ubuntu host metrics by using host network and PID visibility, mounting the host root filesystem read-only at `/host`, and using:
 
 ```text
 --path.rootfs=/host
 ```
 
-The container does not use `privileged: true`, host networking, or the Docker socket. Filesystem collector exclusions remove noisy pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths so dashboard storage metrics focus on real host filesystems.
+The container does not use `privileged: true` or the Docker socket. Host networking is an explicit exception for node-exporter because Linux network counters are network-namespace scoped; without host networking, node-exporter reports the container's `eth0` instead of the Ubuntu host's physical interfaces. Filesystem collector exclusions remove noisy pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths so dashboard storage metrics focus on real host filesystems.
 
 ## Validation
 

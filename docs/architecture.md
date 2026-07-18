@@ -99,7 +99,7 @@ Caddy publishes HTTP on `192.168.178.2:80/tcp` and HTTPS on `192.168.178.2:443/t
 
 Homepage remains the HomeLab landing page and overview. Glances provides lightweight live host monitoring and supplies the current host metrics displayed by Homepage. Uptime Kuma provides service availability monitoring, response time monitoring, uptime history, and a local status dashboard.
 
-Grafana and Prometheus provide historical host metrics and dashboards. Grafana is the public UI contract at `grafana.home.arpa`; Prometheus and node-exporter are internal implementation details on the Docker `proxy` network. node-exporter reports Ubuntu host metrics through host PID visibility and a read-only host root mount, and excludes pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths from filesystem metrics.
+Grafana and Prometheus provide historical host metrics and dashboards. Grafana is the public UI contract at `grafana.home.arpa`; Prometheus is an internal implementation detail on the Docker `proxy` network. node-exporter is an explicit host-monitoring exception: it uses the host network namespace, host PID visibility, and a read-only host root mount so it reports the Ubuntu host's real CPU, memory, filesystem, and network interface metrics. Its filesystem collector excludes pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths.
 
 ## Request Flow
 
