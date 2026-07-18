@@ -16,6 +16,8 @@ VIDEO_EXTENSIONS = {
     ".avi",
     ".m4v",
     ".mov",
+    ".m2ts",
+    ".ts",
     ".webm",
 }
 
