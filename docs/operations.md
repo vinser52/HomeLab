@@ -65,6 +65,27 @@ docker compose logs --tail=100 node-exporter
 
 After deployment, validate DNS and HTTPS routing from a Mac or LAN client.
 
+Monitoring state directories should be writable by the configured HomeLab service user before first start on the Ubuntu HomeLab server:
+
+```bash
+set -a
+. ./.env
+set +a
+sudo install -d -o "${HOMELAB_UID:-1000}" -g "${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/grafana/data"
+sudo install -d -o "${HOMELAB_UID:-1000}" -g "${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data"
+```
+
+If Grafana logs `GF_PATHS_DATA='/var/lib/grafana' is not writable` or Prometheus logs `open /prometheus/queries.active: permission denied`, Docker likely created the bind directories as `root`. Fix ownership and restart the monitoring services:
+
+```bash
+set -a
+. ./.env
+set +a
+sudo chown -R "${HOMELAB_UID:-1000}:${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/grafana/data"
+sudo chown -R "${HOMELAB_UID:-1000}:${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data"
+docker compose up -d grafana prometheus
+```
+
 DNS tests:
 
 ```bash
@@ -119,7 +140,7 @@ Monitoring runtime checks should be run on the Ubuntu HomeLab server, not on the
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 ```
 
-In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, and load metrics. The `up{job="node-exporter"}` query should return `1`, and filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, or Docker runtime paths.
+In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, and load metrics. The `up{job="node-exporter"}` query should return `1`, and filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, Ubuntu Snap mounts, or Docker runtime paths.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 

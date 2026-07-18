@@ -29,6 +29,27 @@ ${HOMELAB_STATE_DIR}/prometheus/data
 
 Grafana's runtime database stores local users, sessions, preferences, and dashboards created through the UI. Prometheus stores its time-series database under its state directory.
 
+Before first start on the Ubuntu HomeLab server, create the state directories with the same owner used by the containers:
+
+```bash
+set -a
+. ./.env
+set +a
+sudo install -d -o "${HOMELAB_UID:-1000}" -g "${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/grafana/data"
+sudo install -d -o "${HOMELAB_UID:-1000}" -g "${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data"
+```
+
+If Docker already created these directories as `root`, fix ownership before restarting the services:
+
+```bash
+set -a
+. ./.env
+set +a
+sudo chown -R "${HOMELAB_UID:-1000}:${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/grafana/data"
+sudo chown -R "${HOMELAB_UID:-1000}:${HOMELAB_GID:-1000}" "${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data"
+docker compose up -d grafana prometheus
+```
+
 Git-managed desired configuration lives under:
 
 ```text
@@ -45,7 +66,7 @@ node-exporter runs in a container but reports Ubuntu host metrics by using host 
 --path.rootfs=/host
 ```
 
-The container does not use `privileged: true`, host networking, or the Docker socket. Filesystem collector exclusions remove noisy pseudo-filesystems, Docker overlay mounts, and container runtime paths so dashboard storage metrics focus on real host filesystems.
+The container does not use `privileged: true`, host networking, or the Docker socket. Filesystem collector exclusions remove noisy pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths so dashboard storage metrics focus on real host filesystems.
 
 ## Validation
 

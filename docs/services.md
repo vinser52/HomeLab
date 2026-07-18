@@ -185,4 +185,4 @@ Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Promethe
 
 Desired monitoring configuration lives in Git under `applications/monitoring/config/`. Grafana provisioning creates the Prometheus datasource and loads committed dashboards. Dashboards created through the Grafana UI live in Grafana runtime state unless they are exported and committed.
 
-node-exporter is configured to report Ubuntu host metrics while running as a container. It uses host PID visibility, mounts the host root filesystem read-only at `/host`, uses `--path.rootfs=/host`, and excludes pseudo-filesystems, Docker overlay mounts, and container runtime paths from filesystem metrics. It does not use `privileged: true`, host networking, or the Docker socket.
+node-exporter is configured to report Ubuntu host metrics while running as a container. It uses host PID visibility, mounts the host root filesystem read-only at `/host`, uses `--path.rootfs=/host`, and excludes pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths from filesystem metrics. It does not use `privileged: true`, host networking, or the Docker socket.
