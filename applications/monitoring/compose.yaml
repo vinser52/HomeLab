@@ -31,7 +31,8 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yaml
       - --storage.tsdb.path=/prometheus
-      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.time=90d
+      - --storage.tsdb.retention.size=20GB
       - --web.enable-lifecycle
     expose:
       # Prometheus stays internal and is used by Grafana over Docker networking.
