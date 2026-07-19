@@ -43,6 +43,26 @@ services:
     networks:
       - proxy
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    container_name: cadvisor
+    restart: unless-stopped
+    expose:
+      # cAdvisor stays internal and is scraped only by Prometheus.
+      - "8080"
+    volumes:
+      # Read-only host and Docker runtime paths let cAdvisor report container metrics.
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    devices:
+      # Allows cAdvisor to collect disk usage details without privileged mode.
+      - /dev/kmsg:/dev/kmsg
+    networks:
+      - proxy
+
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.9.1
     container_name: node-exporter
