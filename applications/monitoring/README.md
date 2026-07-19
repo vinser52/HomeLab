@@ -58,6 +58,13 @@ applications/monitoring/config/
 
 Grafana provisioning config creates the Prometheus datasource and loads committed dashboards from `applications/monitoring/config/grafana/dashboards/`.
 
+Initial dashboards:
+
+| Dashboard | Purpose |
+| --- | --- |
+| `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
+| `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, and Prometheus process resource usage. |
+
 ## Host Metrics
 
 node-exporter runs in a container but reports Ubuntu host metrics by using host network and PID visibility, mounting the host root filesystem read-only at `/host`, and using:
@@ -103,6 +110,7 @@ node_memory_MemAvailable_bytes
 rate(node_cpu_seconds_total[5m])
 node_filesystem_avail_bytes
 rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
+prometheus_tsdb_head_series
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter target as up, and the `Host Metrics Overview` dashboard shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter target as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, and `Monitoring Health` shows Prometheus and node-exporter scrape health.

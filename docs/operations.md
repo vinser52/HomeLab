@@ -142,6 +142,8 @@ docker compose exec prometheus promtool query instant http://localhost:9090 'up{
 
 In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, load, and network metrics. The `up{job="node-exporter"}` query should return `1`; filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, Ubuntu Snap mounts, or Docker runtime paths; and network panels should focus on physical host interfaces rather than `lo`, Docker bridges, or `veth` devices. node-exporter uses host networking intentionally so network panels reflect the Ubuntu host instead of the node-exporter container.
 
+Also confirm that the `Monitoring Health` dashboard shows Prometheus and node-exporter target health, scrape duration, scraped samples, active series, and Prometheus process CPU and memory usage.
+
 See [TLS](tls.md) for Caddy root CA trust setup.
 
 ## `.env` Handling
