@@ -1,6 +1,10 @@
 {
-    admin 0.0.0.0:2019
+    admin off
     metrics
+}
+
+:2019 {
+    metrics /metrics
 }
 
 dns.home.arpa {

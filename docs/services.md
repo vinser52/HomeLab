@@ -191,6 +191,6 @@ The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, 
 
 The initial `Container Metrics Overview` dashboard shows per-container CPU, memory, network throughput, filesystem usage, and filesystem I/O. cAdvisor provides these metrics with read-only host and Docker runtime mounts, without Docker socket access or privileged mode.
 
-The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name.
+The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name or Caddy's admin API.
 
 The initial `Monitoring Health` dashboard shows Prometheus scrape target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage. It exists to confirm that the monitoring stack itself is healthy without mixing those checks into the host metrics dashboard.

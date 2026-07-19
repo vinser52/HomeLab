@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on Caddy's internal admin endpoint at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
+Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -87,7 +87,7 @@ cAdvisor does not use `privileged: true` or the Docker socket. It receives read-
 
 ## Reverse Proxy Metrics
 
-Caddy exposes Prometheus metrics on its internal admin endpoint at `caddy:2019/metrics`. Prometheus scrapes that endpoint from the Docker `proxy` network. The endpoint is not routed through Caddy and is not published directly to the LAN.
+Caddy exposes Prometheus metrics on an internal metrics handler at `caddy:2019/metrics`. Prometheus scrapes that endpoint from the Docker `proxy` network. The endpoint is not routed through Caddy, does not use Caddy's admin API, and is not published directly to the LAN.
 
 The `Reverse Proxy Overview` dashboard shows request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. These metrics observe the HomeLab HTTP contract boundary because Caddy is the only public HTTP/HTTPS entrypoint.
 
@@ -103,6 +103,8 @@ Runtime validation should be run on the Ubuntu HomeLab server after pulling the 
 
 ```bash
 docker compose up -d
+docker compose up -d --force-recreate caddy
+docker compose up -d --force-recreate prometheus
 docker compose ps
 docker compose logs --tail=100 prometheus
 docker compose logs --tail=100 grafana

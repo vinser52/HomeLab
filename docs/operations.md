@@ -139,6 +139,8 @@ Grafana should be accessed through `https://grafana.home.arpa`. It does not publ
 Monitoring runtime checks should be run on the Ubuntu HomeLab server, not on the MacBook:
 
 ```bash
+docker compose up -d --force-recreate caddy
+docker compose up -d --force-recreate prometheus
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
