@@ -334,6 +334,55 @@
       ],
       "title": "Prometheus CPU",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(prometheus_tsdb_storage_blocks_bytes or vector(0)) + sum(prometheus_tsdb_wal_storage_size_bytes or vector(0)) + sum(prometheus_tsdb_head_chunks_storage_size_bytes or vector(0))",
+          "legendFormat": "TSDB storage",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Prometheus DB Size",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -355,6 +404,6 @@
   "timezone": "browser",
   "title": "Monitoring Health",
   "uid": "homelab-monitoring-health",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

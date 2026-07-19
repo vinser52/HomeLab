@@ -189,4 +189,4 @@ node-exporter is configured to report Ubuntu host metrics while running as a con
 
 The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, load, network throughput, packet rate, network errors and drops, and interface state. Network panels filter out loopback, Docker bridge, and `veth` interfaces in PromQL so the default dashboard focuses on physical host networking while preserving the raw metrics for future troubleshooting.
 
-The initial `Monitoring Health` dashboard shows Prometheus scrape target health, scrape duration, scraped samples, active series, and Prometheus process CPU and memory usage. It exists to confirm that the monitoring stack itself is healthy without mixing those checks into the host metrics dashboard.
+The initial `Monitoring Health` dashboard shows Prometheus scrape target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage. It exists to confirm that the monitoring stack itself is healthy without mixing those checks into the host metrics dashboard.
