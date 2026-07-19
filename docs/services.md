@@ -179,7 +179,7 @@ https://grafana.home.arpa
 
 Caddy routes `grafana.home.arpa` to the `grafana` Docker service on port `3000`. Grafana does not publish port `3000` directly to the LAN and is reachable only through Caddy.
 
-Prometheus and cAdvisor stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
+Prometheus and cAdvisor stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080` and Caddy's internal metrics endpoint at `caddy:2019`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
 
 Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with an initial retention period of 15 days.
 
@@ -190,5 +190,7 @@ node-exporter is configured to report Ubuntu host metrics while running as a con
 The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, load, network throughput, packet rate, network errors and drops, and interface state. Network panels filter out loopback, Docker bridge, and `veth` interfaces in PromQL so the default dashboard focuses on physical host networking while preserving the raw metrics for future troubleshooting.
 
 The initial `Container Metrics Overview` dashboard shows per-container CPU, memory, network throughput, filesystem usage, and filesystem I/O. cAdvisor provides these metrics with read-only host and Docker runtime mounts, without Docker socket access or privileged mode.
+
+The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name.
 
 The initial `Monitoring Health` dashboard shows Prometheus scrape target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage. It exists to confirm that the monitoring stack itself is healthy without mixing those checks into the host metrics dashboard.

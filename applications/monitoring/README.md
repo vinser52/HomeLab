@@ -1,6 +1,6 @@
 # Monitoring
 
-Monitoring provides historical host and container metrics for the HomeLab using Prometheus, Grafana, node-exporter, and cAdvisor.
+Monitoring provides historical host, container, and reverse proxy metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, and Caddy's built-in metrics endpoint.
 
 Public URL:
 
@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
+Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on Caddy's internal admin endpoint at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -18,6 +18,7 @@ Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on 
 | Prometheus | Metrics database and scraper | `prometheus:9090` |
 | node-exporter | Ubuntu host metrics exporter | `homelab-server.home.arpa:9100` |
 | cAdvisor | Container metrics exporter | `cadvisor:8080` |
+| Caddy metrics | Reverse proxy metrics endpoint | `caddy:2019` |
 
 ## Runtime Data
 
@@ -65,6 +66,7 @@ Initial dashboards:
 | --- | --- |
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
+| `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
 ## Host Metrics
@@ -83,6 +85,12 @@ cAdvisor reports per-container CPU, memory, network, filesystem usage, and files
 
 cAdvisor does not use `privileged: true` or the Docker socket. It receives read-only access to the host root, `/var/run`, `/sys`, Docker runtime data, and disk metadata so it can inspect running containers.
 
+## Reverse Proxy Metrics
+
+Caddy exposes Prometheus metrics on its internal admin endpoint at `caddy:2019/metrics`. Prometheus scrapes that endpoint from the Docker `proxy` network. The endpoint is not routed through Caddy and is not published directly to the LAN.
+
+The `Reverse Proxy Overview` dashboard shows request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. These metrics observe the HomeLab HTTP contract boundary because Caddy is the only public HTTP/HTTPS entrypoint.
+
 ## Validation
 
 Run Compose validation locally on the MacBook before deployment:
@@ -100,8 +108,10 @@ docker compose logs --tail=100 prometheus
 docker compose logs --tail=100 grafana
 docker compose logs --tail=100 node-exporter
 docker compose logs --tail=100 cadvisor
+docker compose logs --tail=100 caddy
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
 ```
 
 From a LAN client, validate the public service contract:
@@ -121,8 +131,9 @@ rate(node_cpu_seconds_total[5m])
 node_filesystem_avail_bytes
 rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
 container_memory_working_set_bytes
+caddy_http_requests_total
 prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter and cAdvisor targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, and `Monitoring Health` shows Prometheus, node-exporter, and cAdvisor scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, and Caddy targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, and Caddy scrape health.

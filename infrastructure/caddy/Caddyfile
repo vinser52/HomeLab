@@ -1,3 +1,8 @@
+{
+    admin 0.0.0.0:2019
+    metrics
+}
+
 dns.home.arpa {
     tls internal
     reverse_proxy technitium:5380
