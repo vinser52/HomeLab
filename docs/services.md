@@ -193,6 +193,6 @@ The initial `Container Metrics Overview` dashboard shows per-container CPU, memo
 
 The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name or Caddy's admin API.
 
-The initial `Network Gateway Overview` dashboard shows FritzBox target health, WAN throughput, total WAN traffic, WAN packet rate, and router uptime metrics. fritz-exporter uses the FritzBox TR-064 API with credentials stored only in local `.env`.
+The initial `Network Gateway Overview` dashboard shows FritzBox target health, WAN link state, current WAN download and upload speed, WAN link capacity, total WAN traffic, WAN packet rate, router uptime, Wi-Fi channel, and Wi-Fi client metrics. fritz-exporter uses the FritzBox TR-064 API with credentials stored only in local `.env`.
 
 The initial `Monitoring Health` dashboard shows Prometheus scrape target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage. It exists to confirm that the monitoring stack itself is healthy without mixing those checks into the host metrics dashboard.

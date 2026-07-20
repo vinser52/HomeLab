@@ -156,7 +156,7 @@ Also confirm that the `Container Metrics Overview` dashboard shows per-container
 
 Also confirm that the `Reverse Proxy Overview` dashboard shows Caddy request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage.
 
-Also confirm that the `Network Gateway Overview` dashboard shows FritzBox WAN throughput, total WAN traffic, packet rate, and router uptime metrics.
+Also confirm that the `Network Gateway Overview` dashboard shows FritzBox WAN link state, current WAN download and upload speed, WAN capacity, total WAN traffic, packet rate, router uptime, Wi-Fi channels, and Wi-Fi client metrics.
 
 For FritzBox validation, `up{job="fritz-exporter"}` only proves the exporter endpoint is scrapeable. If fritz-exporter logs `Action Not Authorized`, the FritzBox user authenticated but lacks rights for the TR-064 calls; expand the dedicated monitoring user's local FritzBox rights, restart fritz-exporter, and confirm that `fritz_wan_data_bytes_total` returns data.
 
