@@ -63,6 +63,27 @@ services:
     networks:
       - proxy
 
+  fritz-exporter:
+    image: docker.io/pdreker/fritz_exporter:3.2.2
+    container_name: fritz-exporter
+    restart: unless-stopped
+    expose:
+      # fritz-exporter stays internal and is scraped only by Prometheus.
+      - "9787"
+    environment:
+      FRITZ_NAME: FritzBox
+      FRITZ_HOSTNAME: router.home.arpa
+      FRITZ_USERNAME: ${FRITZ_EXPORTER_USERNAME:-}
+      FRITZ_PASSWORD: ${FRITZ_EXPORTER_PASSWORD:-}
+      # v3 defaults to 127.0.0.1; Prometheus needs to reach it over Docker networking.
+      FRITZ_LISTEN_ADDRESS: 0.0.0.0
+      FRITZ_PORT: "9787"
+      FRITZ_LOG_LEVEL: INFO
+      # Extended per-host data can take 20+ seconds on busy networks.
+      FRITZ_HOST_INFO: "false"
+    networks:
+      - proxy
+
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.9.1
     container_name: node-exporter

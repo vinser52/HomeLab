@@ -23,3 +23,10 @@ scrape_configs:
     static_configs:
       - targets:
           - caddy:2019
+
+  - job_name: fritz-exporter
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    static_configs:
+      - targets:
+          - fritz-exporter:9787

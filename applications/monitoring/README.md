@@ -1,6 +1,6 @@
 # Monitoring
 
-Monitoring provides historical host, container, and reverse proxy metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, and Caddy's built-in metrics endpoint.
+Monitoring provides historical host, container, reverse proxy, and gateway metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, Caddy's built-in metrics endpoint, and fritz-exporter.
 
 Public URL:
 
@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
+Only Grafana is exposed through Caddy. Prometheus, cAdvisor, and fritz-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -19,6 +19,7 @@ Only Grafana is exposed through Caddy. Prometheus and cAdvisor stay internal on 
 | node-exporter | Ubuntu host metrics exporter | `homelab-server.home.arpa:9100` |
 | cAdvisor | Container metrics exporter | `cadvisor:8080` |
 | Caddy metrics | Reverse proxy metrics endpoint | `caddy:2019` |
+| fritz-exporter | FritzBox gateway metrics exporter | `fritz-exporter:9787` |
 
 ## Runtime Data
 
@@ -67,6 +68,7 @@ Initial dashboards:
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
 | `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
+| `Network Gateway Overview` | FritzBox exporter health, WAN throughput, WAN traffic, packets, and router uptime metrics. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
 ## Host Metrics
@@ -91,6 +93,19 @@ Caddy exposes Prometheus metrics on an internal metrics handler at `caddy:2019/m
 
 The `Reverse Proxy Overview` dashboard shows request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. These metrics observe the HomeLab HTTP contract boundary because Caddy is the only public HTTP/HTTPS entrypoint.
 
+## Gateway Metrics
+
+fritz-exporter reports FritzBox metrics over the local TR-064 API. It stays internal on the Docker `proxy` network and is scraped by Prometheus at `fritz-exporter:9787`.
+
+The exporter authenticates with a dedicated FritzBox monitoring user. Store the credentials only in local `.env`:
+
+```env
+FRITZ_EXPORTER_USERNAME=homelab-monitoring
+FRITZ_EXPORTER_PASSWORD=
+```
+
+fritz-exporter v3 listens on `127.0.0.1` by default, so the Compose service explicitly sets `FRITZ_LISTEN_ADDRESS=0.0.0.0` for Prometheus scraping over Docker networking. Extended per-host information is disabled because it can take 20+ seconds on busy networks. The Prometheus scrape interval is 60 seconds to keep polling gentle for the router.
+
 ## Validation
 
 Run Compose validation locally on the MacBook before deployment:
@@ -111,9 +126,11 @@ docker compose logs --tail=100 grafana
 docker compose logs --tail=100 node-exporter
 docker compose logs --tail=100 cadvisor
 docker compose logs --tail=100 caddy
+docker compose logs --tail=100 fritz-exporter
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="fritz-exporter"}'
 ```
 
 From a LAN client, validate the public service contract:
@@ -134,8 +151,9 @@ node_filesystem_avail_bytes
 rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
 container_memory_working_set_bytes
 caddy_http_requests_total
+fritz_wan_data
 prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, and Caddy targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, and Caddy scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.
