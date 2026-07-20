@@ -19,8 +19,34 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "FritzBox",
+      "tooltip": "Open the FritzBox web UI",
+      "type": "link",
+      "url": "http://router.home.arpa"
+    }
+  ],
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "panels": [],
+      "title": "Gateway",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "prometheus",
@@ -64,7 +90,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 1,
       "options": {
@@ -140,7 +166,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 0
+        "y": 1
       },
       "id": 2,
       "options": {
@@ -189,7 +215,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 0
+        "y": 1
       },
       "id": 3,
       "options": {
@@ -238,7 +264,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 0
+        "y": 1
       },
       "id": 4,
       "options": {
@@ -287,7 +313,7 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 0
+        "y": 1
       },
       "id": 5,
       "options": {
@@ -336,7 +362,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 0
+        "y": 1
       },
       "id": 6,
       "options": {
@@ -370,6 +396,19 @@
       "type": "stat"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 101,
+      "panels": [],
+      "title": "Internet",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -383,9 +422,9 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 16,
+        "w": 14,
         "x": 0,
-        "y": 4
+        "y": 6
       },
       "id": 7,
       "options": {
@@ -431,9 +470,135 @@
       },
       "fieldConfig": {
         "defaults": {
-          "mappings": [],
-          "max": 600000000,
+          "max": 1,
           "min": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.7
+              },
+              {
+                "color": "red",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 14,
+        "y": 6
+      },
+      "id": 8,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(fritz_wan_datarate_bytes{direction=\"rx\"} * 8) / on(friendly_name, serial, direction) fritz_wan_max_bitrate_bps{direction=\"rx\"}",
+          "legendFormat": "Download",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Download Usage",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.7
+              },
+              {
+                "color": "red",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 14,
+        "y": 10
+      },
+      "id": 9,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(fritz_wan_datarate_bytes{direction=\"tx\"} * 8) / on(friendly_name, serial, direction) fritz_wan_max_bitrate_bps{direction=\"tx\"}",
+          "legendFormat": "Upload",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Upload Usage",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -449,11 +614,11 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 8,
-        "x": 16,
-        "y": 4
+        "w": 5,
+        "x": 19,
+        "y": 6
       },
-      "id": 8,
+      "id": 10,
       "options": {
         "displayMode": "lcd",
         "legend": {
@@ -499,6 +664,19 @@
       "type": "bargauge"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 102,
+      "panels": [],
+      "title": "Wi-Fi",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -511,12 +689,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 0,
-        "y": 13
+        "y": 16
       },
-      "id": 9,
+      "id": 11,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -560,12 +738,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 8,
-        "y": 13
+        "y": 16
       },
-      "id": 10,
+      "id": 12,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
@@ -636,12 +814,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 16,
-        "y": 13
+        "y": 16
       },
-      "id": 11,
+      "id": 13,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -673,6 +851,19 @@
       "type": "stat"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 103,
+      "panels": [],
+      "title": "Traffic",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -688,9 +879,9 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 21
+        "y": 24
       },
-      "id": 12,
+      "id": 14,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -744,9 +935,9 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 21
+        "y": 24
       },
-      "id": 13,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [
@@ -799,9 +990,9 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 21
+        "y": 24
       },
-      "id": 14,
+      "id": 16,
       "options": {
         "legend": {
           "calcs": [
@@ -858,6 +1049,6 @@
   "timezone": "browser",
   "title": "Network Gateway Overview",
   "uid": "homelab-network-gateway",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

@@ -68,7 +68,7 @@ Initial dashboards:
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
 | `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
-| `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity, router uptime, Wi-Fi clients, traffic totals, and packet metrics. |
+| `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity and utilization, router uptime, Wi-Fi clients, traffic totals, and packet metrics. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
 ## Host Metrics
@@ -160,4 +160,4 @@ prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN speed, capacity, Wi-Fi, traffic, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN speed, utilization, capacity, Wi-Fi, traffic, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.
