@@ -147,6 +147,7 @@ docker compose exec prometheus promtool query instant http://localhost:9090 'up{
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="fritz-exporter"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'fritz_wan_data_bytes_total'
 ```
 
 In Grafana, confirm that the Prometheus datasource is healthy and that the `Host Metrics Overview` dashboard shows host CPU, memory, filesystem, load, and network metrics. The `up{job="node-exporter"}` query should return `1`; filesystem metrics should not be dominated by `overlay`, `/proc`, `/sys`, `/dev`, Ubuntu Snap mounts, or Docker runtime paths; and network panels should focus on physical host interfaces rather than `lo`, Docker bridges, or `veth` devices. node-exporter uses host networking intentionally so network panels reflect the Ubuntu host instead of the node-exporter container.
@@ -156,6 +157,8 @@ Also confirm that the `Container Metrics Overview` dashboard shows per-container
 Also confirm that the `Reverse Proxy Overview` dashboard shows Caddy request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage.
 
 Also confirm that the `Network Gateway Overview` dashboard shows FritzBox WAN throughput, total WAN traffic, packet rate, and router uptime metrics.
+
+For FritzBox validation, `up{job="fritz-exporter"}` only proves the exporter endpoint is scrapeable. If fritz-exporter logs `Action Not Authorized`, the FritzBox user authenticated but lacks rights for the TR-064 calls; expand the dedicated monitoring user's local FritzBox rights, restart fritz-exporter, and confirm that `fritz_wan_data_bytes_total` returns data.
 
 Also confirm that the `Monitoring Health` dashboard shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage.
 

@@ -131,7 +131,10 @@ docker compose exec prometheus promtool query instant http://localhost:9090 'up{
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="fritz-exporter"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'fritz_wan_data'
 ```
+
+`up{job="fritz-exporter"}` only confirms that Prometheus can scrape the exporter process. If fritz-exporter logs `Action Not Authorized`, the exporter is reachable but the FritzBox user lacks the rights needed for TR-064 metric calls. Expand the dedicated FritzBox monitoring user's local rights, restart fritz-exporter, and confirm that FritzBox metrics such as `fritz_wan_data` return data.
 
 From a LAN client, validate the public service contract:
 
@@ -151,7 +154,8 @@ node_filesystem_avail_bytes
 rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
 container_memory_working_set_bytes
 caddy_http_requests_total
-fritz_wan_data
+fritz_wan_data_bytes_total
+fritz_wan_datarate_bytes
 prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```

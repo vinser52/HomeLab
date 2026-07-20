@@ -121,15 +121,15 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(fritz_wan_data{direction=\"rx\"}[5m])",
-          "legendFormat": "{{name}} receive",
+          "expr": "fritz_wan_datarate_bytes{direction=\"rx\"}",
+          "legendFormat": "{{friendly_name}} receive",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(fritz_wan_data{direction=\"tx\"}[5m])",
-          "legendFormat": "{{name}} transmit",
+          "expr": "fritz_wan_datarate_bytes{direction=\"tx\"}",
+          "legendFormat": "{{friendly_name}} transmit",
           "range": true,
           "refId": "B"
         }
@@ -173,15 +173,15 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "fritz_wan_data{direction=\"rx\"}",
-          "legendFormat": "{{name}} received",
+          "expr": "fritz_wan_data_bytes_total{direction=\"rx\"}",
+          "legendFormat": "{{friendly_name}} received",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "fritz_wan_data{direction=\"tx\"}",
-          "legendFormat": "{{name}} transmitted",
+          "expr": "fritz_wan_data_bytes_total{direction=\"tx\"}",
+          "legendFormat": "{{friendly_name}} transmitted",
           "range": true,
           "refId": "B"
         }
@@ -225,15 +225,15 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(fritz_wan_data_packets{direction=\"rx\"}[5m])",
-          "legendFormat": "{{name}} receive",
+          "expr": "rate(fritz_wan_data_packets_count_total{direction=\"rx\"}[5m])",
+          "legendFormat": "{{friendly_name}} receive",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(fritz_wan_data_packets{direction=\"tx\"}[5m])",
-          "legendFormat": "{{name}} transmit",
+          "expr": "rate(fritz_wan_data_packets_count_total{direction=\"tx\"}[5m])",
+          "legendFormat": "{{friendly_name}} transmit",
           "range": true,
           "refId": "B"
         }
@@ -277,14 +277,254 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{job=\"fritz-exporter\",__name__=~\"fritz_.*uptime.*\"}",
-          "legendFormat": "{{__name__}} {{name}}",
+          "expr": "fritz_uptime_seconds_total",
+          "legendFormat": "{{friendly_name}}",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Router Uptime",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "fritz_wan_max_bitrate_bps{direction=\"rx\"}",
+          "legendFormat": "{{friendly_name}} receive",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "fritz_wan_max_bitrate_bps{direction=\"tx\"}",
+          "legendFormat": "{{friendly_name}} transmit",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "WAN Link Capacity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "fritz_wifi_associations_count{enabled=\"1\"}",
+          "legendFormat": "{{wifi_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Wi-Fi Associated Clients",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "unit": "binBps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "rate(fritz_lan_data_bytes_total{direction=\"rx\"}[5m])",
+          "legendFormat": "{{friendly_name}} receive",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "rate(fritz_lan_data_bytes_total{direction=\"tx\"}[5m])",
+          "legendFormat": "{{friendly_name}} transmit",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "LAN Throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "text": "Down"
+                },
+                "1": {
+                  "text": "Up"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "fritz_device_reachable",
+          "legendFormat": "{{friendly_name}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "fritz_wan_phys_link_status",
+          "legendFormat": "{{friendly_name}} WAN",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "fritz_lan_status",
+          "legendFormat": "{{friendly_name}} LAN",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Gateway Link State",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -306,6 +546,6 @@
   "timezone": "browser",
   "title": "Network Gateway Overview",
   "uid": "homelab-network-gateway",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
