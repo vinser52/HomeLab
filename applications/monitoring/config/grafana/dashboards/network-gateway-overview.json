@@ -1194,11 +1194,11 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "clients",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1236,7 +1236,7 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -1278,7 +1278,8 @@
         }
       ],
       "title": "Wi-Fi Clients",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Stacked by Wi-Fi band; the Y-axis shows the total number of associated clients."
     },
     {
       "datasource": {
@@ -1493,6 +1494,6 @@
   "timezone": "browser",
   "title": "Network Gateway Overview",
   "uid": "homelab-network-gateway",
-  "version": 10,
+  "version": 12,
   "weekStart": ""
 }
