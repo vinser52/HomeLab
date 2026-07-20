@@ -68,10 +68,10 @@ Initial dashboards:
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
 | `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
-| `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity and utilization, router uptime, Wi-Fi clients, traffic totals, and packet metrics. |
+| `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity, router uptime, Wi-Fi clients, and WAN traffic accounting. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
-`Network Gateway Overview` is adapted from Grafana dashboard `17751` for `pdreker/fritz_exporter`. The upstream dashboard expects DSL and per-host metrics, so the HomeLab version keeps the upstream layout and WAN/Wi-Fi panels but replaces DSL/PPP/host-info-dependent panels with cable-compatible FritzBox metrics.
+`Network Gateway Overview` is adapted from Grafana dashboard `17751` for `pdreker/fritz_exporter`. The upstream dashboard expects DSL and per-host metrics, so the HomeLab version keeps the upstream layout and WAN/Wi-Fi panels but replaces DSL/PPP/host-info-dependent panels with cable-compatible FritzBox metrics. The 24-hour, 30-day, and hourly traffic panels use observed deltas from FritzBox WAN byte counters and stay empty until Prometheus has enough history for the requested time window.
 
 ## Host Metrics
 
@@ -162,4 +162,4 @@ prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN speed, utilization, capacity, Wi-Fi, traffic, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN speed, capacity, traffic accounting, Wi-Fi, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.

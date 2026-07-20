@@ -889,6 +889,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "Observed WAN traffic delta over the last 24 hours, using max minus min from FritzBox byte counters. Hidden until Prometheus has roughly a full day of FritzBox samples.",
       "fieldConfig": {
         "defaults": {
           "decimals": 1,
@@ -897,7 +898,7 @@
               "options": {
                 "match": "null",
                 "result": {
-                  "text": "N/A"
+                  "text": "Waiting for history"
                 }
               },
               "type": "special"
@@ -909,10 +910,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "orange",
-                "value": 80
               }
             ]
           },
@@ -926,16 +923,13 @@
         "x": 0,
         "y": 15
       },
-      "hideTimeOverride": false,
       "id": 22,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 10000,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -943,7 +937,9 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "12.1.0",
       "targets": [
@@ -953,22 +949,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "increase(fritz_wan_data_bytes_total{serial=\"$serial\"}[24h])",
+          "expr": "clamp_min(max_over_time(fritz_wan_data_bytes_total{serial=\"$serial\"}[24h]) - min_over_time(fritz_wan_data_bytes_total{serial=\"$serial\"}[24h]), 0) and on(serial,direction) (time() - min_over_time(timestamp(fritz_wan_data_bytes_total{serial=\"$serial\"})[24h:15s]) >= 82800)",
           "legendFormat": "{{direction}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "timeFrom": "24h",
       "title": "Traffic 24h",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "valueLabel": "direction"
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -976,6 +963,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "Observed WAN traffic delta over the last 30 days, using max minus min from FritzBox byte counters. Hidden until Prometheus has roughly 29 days of FritzBox samples.",
       "fieldConfig": {
         "defaults": {
           "decimals": 1,
@@ -984,7 +972,7 @@
               "options": {
                 "match": "null",
                 "result": {
-                  "text": "N/A"
+                  "text": "Waiting for history"
                 }
               },
               "type": "special"
@@ -996,10 +984,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "super-light-red",
-                "value": 80
               }
             ]
           },
@@ -1014,14 +998,12 @@
         "y": 15
       },
       "id": 8,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 10000,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -1029,7 +1011,9 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "12.1.0",
       "targets": [
@@ -1039,22 +1023,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "increase(fritz_wan_data_bytes_total{serial=\"$serial\"}[30d])",
+          "expr": "clamp_min(max_over_time(fritz_wan_data_bytes_total{serial=\"$serial\"}[30d]) - min_over_time(fritz_wan_data_bytes_total{serial=\"$serial\"}[30d]), 0) and on(serial,direction) (time() - min_over_time(timestamp(fritz_wan_data_bytes_total{serial=\"$serial\"})[30d:15s]) >= 2505600)",
           "legendFormat": "{{direction}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "timeFrom": "1M",
       "title": "Traffic 30d",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "valueLabel": "direction"
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -1062,6 +1037,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "description": "Observed hourly WAN traffic delta from FritzBox byte counters. Uses max minus min to avoid Prometheus counter extrapolation on router-provided counters.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1074,7 +1050,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "bars",
-            "fillOpacity": 100,
+            "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1097,7 +1073,7 @@
               "mode": "off"
             }
           },
-          "decimals": 0,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1105,10 +1081,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1144,36 +1116,6 @@
                 }
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "fritzbox_value.non_negative_derivative"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#ba43a9",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "fritzbox_value.non_negative_difference"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#e24d42",
-                  "mode": "fixed"
-                }
-              }
-            ]
           }
         ]
       },
@@ -1183,10 +1125,8 @@
         "x": 12,
         "y": 15
       },
-      "hideTimeOverride": false,
       "id": 2,
       "interval": "1h",
-      "links": [],
       "options": {
         "legend": {
           "calcs": [],
@@ -1195,6 +1135,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
@@ -1207,7 +1148,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "increase(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"rx\"}[1h])",
+          "expr": "clamp_min(max_over_time(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"rx\"}[1h]) - min_over_time(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"rx\"}[1h]), 0) and on(serial,direction) (time() - min_over_time(timestamp(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"rx\"})[1h:15s]) >= 3300)",
           "legendFormat": "Download",
           "range": true,
           "refId": "A"
@@ -1218,7 +1159,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "increase(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"tx\"}[1h])",
+          "expr": "clamp_min(max_over_time(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"tx\"}[1h]) - min_over_time(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"tx\"}[1h]), 0) and on(serial,direction) (time() - min_over_time(timestamp(fritz_wan_data_bytes_total{serial=\"$serial\",direction=\"tx\"})[1h:15s]) >= 3300)",
           "legendFormat": "Upload",
           "range": true,
           "refId": "B"
@@ -1552,6 +1493,6 @@
   "timezone": "browser",
   "title": "Network Gateway Overview",
   "uid": "homelab-network-gateway",
-  "version": 6,
+  "version": 10,
   "weekStart": ""
 }
