@@ -71,6 +71,8 @@ Initial dashboards:
 | `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity and utilization, router uptime, Wi-Fi clients, traffic totals, and packet metrics. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
+`Network Gateway Overview` is adapted from Grafana dashboard `17751` for `pdreker/fritz_exporter`. The upstream dashboard expects DSL and per-host metrics, so the HomeLab version keeps the upstream layout and WAN/Wi-Fi panels but replaces DSL/PPP/host-info-dependent panels with cable-compatible FritzBox metrics.
+
 ## Host Metrics
 
 node-exporter runs in a container but reports Ubuntu host metrics by using host network and PID visibility, mounting the host root filesystem read-only at `/host`, and using:
