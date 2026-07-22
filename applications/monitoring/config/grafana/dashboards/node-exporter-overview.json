@@ -287,7 +287,14 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "unit": "binBps"
+          "unit": "bps",
+          "custom": {
+            "axisLabel": "bits/sec",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          }
         },
         "overrides": []
       },
@@ -315,21 +322,22 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|docker.*|br-.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|docker.*|br-.*|veth.*\"}[1m]) * 8",
           "legendFormat": "{{device}} receive",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|docker.*|br-.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|docker.*|br-.*|veth.*\"}[1m]) * 8",
           "legendFormat": "{{device}} transmit",
           "range": true,
           "refId": "B"
         }
       ],
       "title": "Network Throughput",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Host interface throughput averaged over 1 minute. This shows traffic seen by the Ubuntu host, not router WAN speedtest results."
     },
     {
       "datasource": {
@@ -339,7 +347,14 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "unit": "pps"
+          "unit": "pps",
+          "custom": {
+            "axisLabel": "packets/sec",
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
+          }
         },
         "overrides": []
       },
@@ -367,21 +382,22 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(node_network_receive_packets_total{device!~\"lo|docker.*|br-.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_receive_packets_total{device!~\"lo|docker.*|br-.*|veth.*\"}[1m])",
           "legendFormat": "{{device}} receive",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "rate(node_network_transmit_packets_total{device!~\"lo|docker.*|br-.*|veth.*\"}[5m])",
+          "expr": "rate(node_network_transmit_packets_total{device!~\"lo|docker.*|br-.*|veth.*\"}[1m])",
           "legendFormat": "{{device}} transmit",
           "range": true,
           "refId": "B"
         }
       ],
       "title": "Network Packets",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Host interface packet rate averaged over 1 minute. Includes real host interfaces such as Ethernet, Wi-Fi, and host VPN tunnels; Docker bridge and veth interfaces are filtered out."
     },
     {
       "datasource": {
@@ -391,7 +407,10 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "unit": "pps"
+          "unit": "pps",
+          "custom": {
+            "axisLabel": "events/sec"
+          }
         },
         "overrides": []
       },
@@ -447,7 +466,8 @@
         }
       ],
       "title": "Network Errors And Drops",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Host interface error/drop rate. Docker bridge and veth interfaces are filtered out; host VPN tunnels remain visible."
     },
     {
       "datasource": {
@@ -524,7 +544,8 @@
         }
       ],
       "title": "Interface State",
-      "type": "stat"
+      "type": "stat",
+      "description": "Operational state for host interfaces after filtering loopback, Docker bridge, and veth devices."
     }
   ],
   "preload": false,
@@ -545,6 +566,6 @@
   "timezone": "browser",
   "title": "Host Metrics Overview",
   "uid": "homelab-node-exporter",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
