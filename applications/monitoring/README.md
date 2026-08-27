@@ -1,6 +1,6 @@
 # Monitoring
 
-Monitoring provides historical host, container, reverse proxy, and gateway metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, Caddy's built-in metrics endpoint, and fritz-exporter.
+Monitoring provides historical host, container, reverse proxy, DNS, and gateway metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, Caddy's built-in metrics endpoint, technitium-exporter, and fritz-exporter.
 
 Public URL:
 
@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus, cAdvisor, and fritz-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
+Only Grafana is exposed through Caddy. Prometheus, cAdvisor, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -19,6 +19,7 @@ Only Grafana is exposed through Caddy. Prometheus, cAdvisor, and fritz-exporter 
 | node-exporter | Ubuntu host metrics exporter | `homelab-server.home.arpa:9100` |
 | cAdvisor | Container metrics exporter | `cadvisor:8080` |
 | Caddy metrics | Reverse proxy metrics endpoint | `caddy:2019` |
+| technitium-exporter | Technitium DNS metrics exporter | `technitium-exporter:9105` |
 | fritz-exporter | FritzBox gateway metrics exporter | `fritz-exporter:9787` |
 
 ## Runtime Data
@@ -68,6 +69,7 @@ Initial dashboards:
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
 | `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
+| `DNS Server Overview` | Technitium DNS health, realtime query counters, cache/block ratios, zones, DHCP, protocols, query types, and top clients/domains. |
 | `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity, router uptime, Wi-Fi clients, and WAN traffic accounting. |
 | `Monitoring Health` | Prometheus scrape health, scrape behavior, active series, DB size, and Prometheus process resource usage. |
 
@@ -94,6 +96,18 @@ cAdvisor does not use `privileged: true` or the Docker socket. It receives read-
 Caddy exposes Prometheus metrics on an internal metrics handler at `caddy:2019/metrics`. Prometheus scrapes that endpoint from the Docker `proxy` network. The endpoint is not routed through Caddy, does not use Caddy's admin API, and is not published directly to the LAN.
 
 The `Reverse Proxy Overview` dashboard shows request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. These metrics observe the HomeLab HTTP contract boundary because Caddy is the only public HTTP/HTTPS entrypoint.
+
+## DNS Metrics
+
+technitium-exporter reports Technitium DNS metrics through the Technitium HTTP API. It stays internal on the Docker `proxy` network and is scraped by Prometheus at `technitium-exporter:9105`.
+
+The exporter authenticates with the shared Technitium monitoring API token. Create a read-only Technitium user for monitoring, generate an API token for that user, and store it only in local `.env`:
+
+```env
+TECHNITIUM_API_TOKEN=
+```
+
+The exporter is configured for a single Technitium DNS server at `http://technitium:5380`, uses the Prometheus label `server="technitium"`, and reads Technitium dashboard-window metrics for `LastHour`. Its realtime metrics use Technitium v15 lifetime counters where available, which are better suited for Prometheus rates.
 
 ## Gateway Metrics
 
@@ -128,15 +142,18 @@ docker compose logs --tail=100 grafana
 docker compose logs --tail=100 node-exporter
 docker compose logs --tail=100 cadvisor
 docker compose logs --tail=100 caddy
+docker compose logs --tail=100 technitium-exporter
 docker compose logs --tail=100 fritz-exporter
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="technitium-exporter"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'technitium_up'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="fritz-exporter"}'
-docker compose exec prometheus promtool query instant http://localhost:9090 'fritz_wan_data'
+docker compose exec prometheus promtool query instant http://localhost:9090 'fritz_wan_data_bytes_total'
 ```
 
-`up{job="fritz-exporter"}` only confirms that Prometheus can scrape the exporter process. If fritz-exporter logs `Action Not Authorized`, the exporter is reachable but the FritzBox user lacks the rights needed for TR-064 metric calls. Expand the dedicated FritzBox monitoring user's local rights, restart fritz-exporter, and confirm that FritzBox metrics such as `fritz_wan_data` return data.
+`up{job="fritz-exporter"}` only confirms that Prometheus can scrape the exporter process. If fritz-exporter logs `Action Not Authorized`, the exporter is reachable but the FritzBox user lacks the rights needed for TR-064 metric calls. Expand the dedicated FritzBox monitoring user's local rights, restart fritz-exporter, and confirm that FritzBox metrics such as `fritz_wan_data_bytes_total` return data.
 
 From a LAN client, validate the public service contract:
 
@@ -156,10 +173,13 @@ node_filesystem_avail_bytes
 rate(node_network_receive_bytes_total{device!~"lo|docker.*|br-.*|veth.*"}[5m])
 container_memory_working_set_bytes
 caddy_http_requests_total
+technitium_up
+rate(technitium_dns_realtime_queries_total[5m])
+technitium_dns_queries_window
 fritz_wan_data_bytes_total
 fritz_wan_datarate_bytes
 prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `Network Gateway Overview` shows FritzBox WAN speed, capacity, traffic accounting, Wi-Fi, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, technitium-exporter, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `DNS Server Overview` shows Technitium DNS health and query metrics, `Network Gateway Overview` shows FritzBox WAN speed, capacity, traffic accounting, Wi-Fi, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, technitium-exporter, and fritz-exporter scrape health.

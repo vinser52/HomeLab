@@ -82,7 +82,7 @@ Direct access to `http://192.168.178.2:5380` is no longer expected once Caddy is
 
 Homepage can show Technitium DNS statistics on the `dns.home.arpa` card using Technitium's HTTP API.
 
-Create a dedicated Technitium user for Homepage and generate an API token for that user instead of reusing the main administrator account. Store the token only in local `.env` as `HOMEPAGE_VAR_TECHNITIUM_API_KEY`.
+Create a dedicated Technitium monitoring user and generate an API token for that user instead of reusing the main administrator account. Store the token only in local `.env` as `TECHNITIUM_API_TOKEN`. Compose passes that token into Homepage using the variable name expected by the Homepage widget.
 
 This keeps Homepage configuration committed to Git while keeping credentials local to the deployment.
 

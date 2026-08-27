@@ -30,3 +30,9 @@ scrape_configs:
     static_configs:
       - targets:
           - fritz-exporter:9787
+
+  - job_name: technitium-exporter
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - technitium-exporter:9105

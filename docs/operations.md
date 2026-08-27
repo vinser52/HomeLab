@@ -146,6 +146,8 @@ docker compose up -d --force-recreate prometheus
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="technitium-exporter"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'technitium_up'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="fritz-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'fritz_wan_data_bytes_total'
 ```
@@ -156,11 +158,13 @@ Also confirm that the `Container Metrics Overview` dashboard shows per-container
 
 Also confirm that the `Reverse Proxy Overview` dashboard shows Caddy request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage.
 
+Also confirm that the `DNS Server Overview` dashboard shows Technitium API health, realtime query rate, cache/block ratios, zones, query types, protocols, and top clients/domains. `up{job="technitium-exporter"}` only proves Prometheus can scrape the exporter; `technitium_up` confirms that the exporter can authenticate to Technitium and read the API.
+
 Also confirm that the `Network Gateway Overview` dashboard shows FritzBox WAN link state, current WAN download and upload speed, WAN capacity, traffic accounting, router uptime, Wi-Fi channels, and Wi-Fi client metrics. The hourly traffic panel needs about one hour of FritzBox samples, the 24-hour traffic panel needs about one day, and the 30-day traffic panel needs about one month before those panels are meaningful.
 
 For FritzBox validation, `up{job="fritz-exporter"}` only proves the exporter endpoint is scrapeable. If fritz-exporter logs `Action Not Authorized`, the FritzBox user authenticated but lacks rights for the TR-064 calls; expand the dedicated monitoring user's local FritzBox rights, restart fritz-exporter, and confirm that `fritz_wan_data_bytes_total` returns data.
 
-Also confirm that the `Monitoring Health` dashboard shows Prometheus, node-exporter, cAdvisor, Caddy, and fritz-exporter target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage.
+Also confirm that the `Monitoring Health` dashboard shows Prometheus, node-exporter, cAdvisor, Caddy, technitium-exporter, and fritz-exporter target health, scrape duration, scraped samples, active series, Prometheus DB size, and Prometheus process CPU and memory usage.
 
 See [TLS](tls.md) for Caddy root CA trust setup.
 

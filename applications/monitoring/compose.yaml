@@ -84,6 +84,26 @@ services:
     networks:
       - proxy
 
+  technitium-exporter:
+    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v2.0.1
+    container_name: technitium-exporter
+    restart: unless-stopped
+    expose:
+      # technitium-exporter stays internal and is scraped only by Prometheus.
+      - "9105"
+    environment:
+      TECHNITIUM_BASE_URL: http://technitium:5380
+      TECHNITIUM_TOKEN: ${TECHNITIUM_API_TOKEN:-}
+      TECHNITIUM_STATS_RANGE: LastHour
+      TECHNITIUM_TOP_LIMIT: "25"
+      EXPORTER_PORT: "9105"
+      SERVER_LABEL: technitium
+      LOG_LEVEL: INFO
+    depends_on:
+      - technitium
+    networks:
+      - proxy
+
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.9.1
     container_name: node-exporter

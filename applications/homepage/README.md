@@ -50,7 +50,7 @@ The DNS card uses Homepage's built-in Technitium widget. Homepage connects to Te
 http://technitium:5380
 ```
 
-The widget uses `HOMEPAGE_VAR_TECHNITIUM_API_KEY` from `.env`. Leave the token out of Git.
+The widget uses the shared `TECHNITIUM_API_TOKEN` from `.env`. Compose passes it into Homepage as the widget-specific `HOMEPAGE_VAR_TECHNITIUM_API_KEY` container variable. Leave the token out of Git.
 
 Manual setup after deployment:
 
@@ -60,7 +60,7 @@ Manual setup after deployment:
 4. Add the monitors to that status page.
 5. Open `https://dns.home.arpa`.
 6. Create a dedicated Technitium user for Homepage with the minimum dashboard permissions needed for read-only statistics.
-7. Generate an API token for that user and set `HOMEPAGE_VAR_TECHNITIUM_API_KEY` in `.env`.
+7. Generate an API token for that user and set `TECHNITIUM_API_TOKEN` in `.env`.
 
 Do not configure notifications or public/external status publishing yet.
 

@@ -110,7 +110,7 @@ Homepage configuration is stored in `applications/homepage/config/` and committe
 
 Homepage gets live host metrics from Glances over the internal Docker `proxy` network.
 
-The DNS card also uses Homepage's Technitium widget over Docker networking at `http://technitium:5380`. The widget should authenticate with a dedicated Technitium API token stored only in local `.env` as `HOMEPAGE_VAR_TECHNITIUM_API_KEY`.
+The DNS card also uses Homepage's Technitium widget over Docker networking at `http://technitium:5380`. The widget authenticates with the shared Technitium monitoring API token stored only in local `.env` as `TECHNITIUM_API_TOKEN`; Compose passes that token into Homepage using the variable name expected by the Homepage widget.
 
 ## OpenSpeedTest
 
@@ -179,9 +179,9 @@ https://grafana.home.arpa
 
 Caddy routes `grafana.home.arpa` to the `grafana` Docker service on port `3000`. Grafana does not publish port `3000` directly to the LAN and is reachable only through Caddy.
 
-Prometheus, cAdvisor, and fritz-exporter stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080`, Caddy's internal metrics endpoint at `caddy:2019`, and fritz-exporter at `fritz-exporter:9787`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
+Prometheus, cAdvisor, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080`, Caddy's internal metrics endpoint at `caddy:2019`, technitium-exporter at `technitium-exporter:9105`, and fritz-exporter at `fritz-exporter:9787`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
 
-Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with an initial retention period of 15 days.
+Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with a retention period of 90 days and a size cap of 20GB.
 
 Desired monitoring configuration lives in Git under `applications/monitoring/config/`. Grafana provisioning creates the Prometheus datasource and loads committed dashboards. Dashboards created through the Grafana UI live in Grafana runtime state unless they are exported and committed.
 
@@ -192,6 +192,8 @@ The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, 
 The initial `Container Metrics Overview` dashboard shows per-container CPU, memory, network throughput, filesystem usage, and filesystem I/O. cAdvisor provides these metrics with read-only host and Docker runtime mounts, without Docker socket access or privileged mode.
 
 The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name or Caddy's admin API.
+
+The initial `DNS Server Overview` dashboard is adapted from Grafana dashboard `24555` for `guycalledseven/technitium-dns-prometheus-exporter`. It shows Technitium API health, realtime DNS query counters, cache and block ratios, dashboard-window query statistics, zones, DHCP leases, protocols, query types, and top clients/domains. technitium-exporter uses the shared Technitium monitoring API token stored only in local `.env`.
 
 The initial `Network Gateway Overview` dashboard is adapted from Grafana dashboard `17751` for `pdreker/fritz_exporter`. It shows FritzBox target health, WAN link state, current WAN download and upload speed, WAN link capacity, WAN traffic accounting, router uptime, Wi-Fi channel, and Wi-Fi client metrics. The upstream dashboard's DSL and host-info-dependent panels are replaced with cable-compatible metrics for this HomeLab. The 24-hour, 30-day, and hourly traffic panels use observed counter deltas and remain empty until Prometheus has enough history for those windows. fritz-exporter uses the FritzBox TR-064 API with credentials stored only in local `.env`.
 

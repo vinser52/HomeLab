@@ -2,7 +2,7 @@
 
 This repository is the source of truth for a Docker Compose based HomeLab. It is developed and deployed to a home Ubuntu server via Git, and currently runs infrastructure services for the local network.
 
-The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, Uptime Kuma, Jellyfin, Grafana, Prometheus, and node-exporter. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, Uptime Kuma tracks service availability, Jellyfin provides local media streaming, and the monitoring stack provides historical host metrics.
+The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, Uptime Kuma, Jellyfin, Grafana, Prometheus, node-exporter, cAdvisor, fritz-exporter, and technitium-exporter. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, Uptime Kuma tracks service availability, Jellyfin provides local media streaming, and the monitoring stack provides historical host, container, gateway, reverse proxy, and DNS metrics.
 
 ## Current Environment
 
@@ -19,7 +19,7 @@ The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpe
 | Live monitoring | Glances | Current implementation of `glances.home.arpa`. |
 | Availability monitoring | Uptime Kuma | Current implementation of `status.home.arpa`. |
 | Media streaming | Jellyfin | Current implementation of `jellyfin.home.arpa`. |
-| Historical monitoring | Grafana, Prometheus, node-exporter | Current implementation of `grafana.home.arpa` and internal host metrics storage. |
+| Historical monitoring | Grafana, Prometheus, node-exporter, cAdvisor, Caddy metrics, fritz-exporter, technitium-exporter | Current implementation of `grafana.home.arpa` and internal metrics storage. |
 
 ## Repository Structure
 
@@ -76,7 +76,7 @@ Runtime state is intentionally not committed and does not live inside the Git re
 
 Homepage configuration lives under `applications/homepage/config/` and is committed to Git. Homepage intentionally contains no committed secrets; authenticated widgets use local `.env` placeholders so API tokens stay out of the repository.
 
-Homepage gets live host metrics from Glances over the internal Docker network. Uptime Kuma monitors service availability and response time. Grafana and Prometheus provide historical host metrics collected from node-exporter.
+Homepage gets live host metrics from Glances over the internal Docker network. Uptime Kuma monitors service availability and response time. Grafana and Prometheus provide historical host, container, gateway, reverse proxy, and DNS metrics.
 
 Caddy provides LAN-only HTTPS using its internal CA. Browsers will warn until the Caddy root CA is trusted on each client device. See [TLS](docs/tls.md).
 
@@ -115,6 +115,9 @@ docker compose logs --tail=100 jellyfin
 docker compose logs --tail=100 grafana
 docker compose logs --tail=100 prometheus
 docker compose logs --tail=100 node-exporter
+docker compose logs --tail=100 cadvisor
+docker compose logs --tail=100 fritz-exporter
+docker compose logs --tail=100 technitium-exporter
 ```
 
 Open the Technitium Web UI through Caddy:
