@@ -72,7 +72,7 @@ services:
       - "9787"
     environment:
       FRITZ_NAME: FritzBox
-      FRITZ_HOSTNAME: router.home.arpa
+      FRITZ_HOSTNAME: ${FRITZBOX_ROUTER_IP:-}
       FRITZ_USERNAME: ${FRITZ_EXPORTER_USERNAME:-}
       FRITZ_PASSWORD: ${FRITZ_EXPORTER_PASSWORD:-}
       # v3 defaults to 127.0.0.1; Prometheus needs to reach it over Docker networking.
