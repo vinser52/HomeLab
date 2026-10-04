@@ -67,6 +67,30 @@ services:
     networks:
       - proxy
 
+  intel-gpu-exporter:
+    # The upstream project does not publish versioned releases, so the image is
+    # pinned to the current linux/amd64 manifest digest for reproducibility.
+    image: ghcr.io/clambin/intel-gpu-exporter@sha256:897295faa176f6388fcee4e35aaa6ab574c65cb837b5f54d732d8018e5499a61
+    container_name: intel-gpu-exporter
+    restart: unless-stopped
+    command:
+      - --interval=5s
+    expose:
+      # Metrics stay internal and are scraped only by Prometheus.
+      - "9100"
+    devices:
+      - /dev/dri:/dev/dri
+    cap_drop:
+      - ALL
+    cap_add:
+      # intel_gpu_top reads the i915 performance monitoring counters.
+      - PERFMON
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    networks:
+      - proxy
+
   fritz-exporter:
     image: docker.io/pdreker/fritz_exporter:3.2.2
     container_name: fritz-exporter

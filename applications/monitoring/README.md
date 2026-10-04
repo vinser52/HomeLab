@@ -1,6 +1,6 @@
 # Monitoring
 
-Monitoring provides historical host, container, reverse proxy, DNS, and gateway metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, Caddy's built-in metrics endpoint, technitium-exporter, and fritz-exporter.
+Monitoring provides historical host, container, Intel GPU, reverse proxy, DNS, and gateway metrics for the HomeLab using Prometheus, Grafana, node-exporter, cAdvisor, intel-gpu-exporter, Caddy's built-in metrics endpoint, technitium-exporter, and fritz-exporter.
 
 Public URL:
 
@@ -8,7 +8,7 @@ Public URL:
 https://grafana.home.arpa
 ```
 
-Only Grafana is exposed through Caddy. Prometheus, cAdvisor, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
+Only Grafana is exposed through Caddy. Prometheus, cAdvisor, intel-gpu-exporter, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network and do not publish ports directly to the LAN. Caddy metrics are exposed only on an internal metrics handler at `caddy:2019`. node-exporter uses the host network namespace so it can report the Ubuntu host's real network interfaces; as a result, its read-only metrics endpoint listens on the HomeLab server at port `9100`.
 
 ## Components
 
@@ -18,6 +18,7 @@ Only Grafana is exposed through Caddy. Prometheus, cAdvisor, technitium-exporter
 | Prometheus | Metrics database and scraper | `prometheus:9090` |
 | node-exporter | Ubuntu host metrics exporter | `homelab-server.home.arpa:9100` |
 | cAdvisor | Container metrics exporter | `cadvisor:8080` |
+| intel-gpu-exporter | Intel i915 GPU performance exporter | `intel-gpu-exporter:9100` |
 | Caddy metrics | Reverse proxy metrics endpoint | `caddy:2019` |
 | technitium-exporter | Technitium DNS metrics exporter | `technitium-exporter:9105` |
 | fritz-exporter | FritzBox gateway metrics exporter | `fritz-exporter:9787` |
@@ -68,6 +69,7 @@ Initial dashboards:
 | --- | --- |
 | `Host Metrics Overview` | Ubuntu host CPU, memory, filesystem, load, and network metrics. |
 | `Container Metrics Overview` | Docker container CPU, memory, network, filesystem usage, and filesystem I/O. |
+| `Intel GPU Overview` | Intel GPU engine utilization, frequency, power, wait state, and memory bandwidth. |
 | `Reverse Proxy Overview` | Caddy request rate, response status, latency, in-flight requests, and process resource usage. |
 | `DNS Server Overview` | Technitium DNS health, realtime query counters, cache/block ratios, zones, DHCP, protocols, query types, and top clients/domains. |
 | `Network Gateway Overview` | FritzBox exporter health, WAN link state, current download/upload speed, link capacity, router uptime, Wi-Fi clients, and WAN traffic accounting. |
@@ -96,6 +98,23 @@ monitoring stack.
 cAdvisor reports per-container CPU, memory, network, filesystem usage, and filesystem I/O. It stays internal on the Docker `proxy` network and is scraped by Prometheus at `cadvisor:8080`.
 
 cAdvisor does not use `privileged: true` or the Docker socket. It receives read-only access to the host root, `/var/run`, `/sys`, Docker runtime data, and disk metadata so it can inspect running containers.
+
+## Intel GPU Metrics
+
+intel-gpu-exporter wraps `intel_gpu_top` and exports i915 performance counters
+to Prometheus. It receives the `/dev/dri` devices and only the Linux
+`CAP_PERFMON` capability required to read performance counters. All other
+capabilities are dropped, the container filesystem is read-only, and
+`no-new-privileges` is enabled. The exporter does not use privileged mode, host
+PID visibility, host networking, or the Docker socket.
+
+The image is pinned by immutable linux/amd64 manifest digest because the
+upstream project does not publish versioned releases. Prometheus scrapes the
+exporter at `intel-gpu-exporter:9100`. The `Intel GPU Overview` dashboard shows
+engine busy/wait/semaphore activity, actual and requested frequency, GPU and
+package power where the platform exposes those counters, and integrated memory
+controller bandwidth. Some power or bandwidth series may be absent when the
+hardware or kernel does not expose the corresponding PMU counters.
 
 ## Reverse Proxy Metrics
 
@@ -147,11 +166,14 @@ docker compose logs --tail=100 prometheus
 docker compose logs --tail=100 grafana
 docker compose logs --tail=100 node-exporter
 docker compose logs --tail=100 cadvisor
+docker compose logs --tail=100 intel-gpu-exporter
 docker compose logs --tail=100 caddy
 docker compose logs --tail=100 technitium-exporter
 docker compose logs --tail=100 fritz-exporter
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="node-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="cadvisor"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="intel-gpu-exporter"}'
+docker compose exec prometheus promtool query instant http://localhost:9090 'gpumon_engine_usage{job="intel-gpu-exporter",attrib="busy"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="caddy"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'up{job="technitium-exporter"}'
 docker compose exec prometheus promtool query instant http://localhost:9090 'technitium_up'
@@ -172,6 +194,9 @@ In Grafana, confirm that the Prometheus datasource is healthy and that these Pro
 
 ```promql
 up{job="node-exporter"}
+up{job="intel-gpu-exporter"}
+gpumon_engine_usage{attrib="busy"}
+gpumon_frequency
 node_uname_info
 node_memory_MemAvailable_bytes
 rate(node_cpu_seconds_total[5m])
@@ -188,4 +213,4 @@ prometheus_tsdb_head_series
 prometheus_tsdb_storage_blocks_bytes
 ```
 
-The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, Caddy, technitium-exporter, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Reverse Proxy Overview` shows Caddy traffic and latency, `DNS Server Overview` shows Technitium DNS health and query metrics, `Network Gateway Overview` shows FritzBox WAN speed, capacity, traffic accounting, Wi-Fi, and router health metrics, and `Monitoring Health` shows Prometheus, node-exporter, cAdvisor, Caddy, technitium-exporter, and fritz-exporter scrape health.
+The MVP is working when Grafana loads through Caddy, Prometheus reports the node-exporter, cAdvisor, intel-gpu-exporter, Caddy, technitium-exporter, and fritz-exporter targets as up, `Host Metrics Overview` shows Ubuntu host CPU, memory, filesystem, load, network throughput, packet rate, errors, drops, and interface state without noisy container filesystems or virtual network interfaces dominating the view, `Container Metrics Overview` shows per-container resource usage, `Intel GPU Overview` shows i915 engine utilization and frequency, `Reverse Proxy Overview` shows Caddy traffic and latency, `DNS Server Overview` shows Technitium DNS health and query metrics, `Network Gateway Overview` shows FritzBox WAN speed, capacity, traffic accounting, Wi-Fi, and router health metrics, and `Monitoring Health` shows the monitoring targets and Prometheus itself as healthy.

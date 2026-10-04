@@ -179,7 +179,7 @@ https://grafana.home.arpa
 
 Caddy routes `grafana.home.arpa` to the `grafana` Docker service on port `3000`. Grafana does not publish port `3000` directly to the LAN and is reachable only through Caddy.
 
-Prometheus, cAdvisor, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080`, Caddy's internal metrics endpoint at `caddy:2019`, technitium-exporter at `technitium-exporter:9105`, and fritz-exporter at `fritz-exporter:9787`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
+Prometheus, cAdvisor, intel-gpu-exporter, technitium-exporter, and fritz-exporter stay internal on the Docker `proxy` network. Grafana reads Prometheus at `http://prometheus:9090`. Prometheus scrapes cAdvisor at `cadvisor:8080`, intel-gpu-exporter at `intel-gpu-exporter:9100`, Caddy's internal metrics endpoint at `caddy:2019`, technitium-exporter at `technitium-exporter:9105`, and fritz-exporter at `fritz-exporter:9787`. node-exporter uses host networking so it can report the Ubuntu host's real network interfaces, and Prometheus scrapes it at `homelab-server.home.arpa:9100`.
 
 Grafana stores runtime state under `${HOMELAB_STATE_DIR}/grafana/data`. Prometheus stores its time-series database under `${HOMELAB_STATE_DIR}/prometheus/data` with a retention period of 90 days and a size cap of 20GB.
 
@@ -190,6 +190,12 @@ node-exporter is configured to report Ubuntu host metrics while running as a con
 The initial `Host Metrics Overview` dashboard includes CPU, memory, filesystem, load, network throughput, packet rate, network errors and drops, and interface state. Network panels filter out loopback, Docker bridge, and `veth` interfaces in PromQL so the default dashboard focuses on physical host networking while preserving the raw metrics for future troubleshooting.
 
 The initial `Container Metrics Overview` dashboard shows per-container CPU, memory, network throughput, filesystem usage, and filesystem I/O. cAdvisor provides these metrics with read-only host and Docker runtime mounts, without Docker socket access or privileged mode.
+
+The `Intel GPU Overview` dashboard shows i915 engine utilization, wait and
+semaphore activity, frequency, power when supported, and integrated memory
+controller bandwidth. intel-gpu-exporter reads `/dev/dri` with only
+`CAP_PERFMON`; all other capabilities are dropped, its filesystem is read-only,
+and it has no Docker socket, host PID, host network, or privileged access.
 
 The initial `Reverse Proxy Overview` dashboard shows Caddy target health, HTTP request rate, response status, request duration, requests in flight, and Caddy process CPU and memory usage. It observes the HomeLab HTTP/HTTPS entrypoint without exposing Caddy's metrics endpoint through a public service name or Caddy's admin API.
 
