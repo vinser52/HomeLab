@@ -68,12 +68,13 @@ services:
       - proxy
 
   intel-gpu-exporter:
-    # The upstream project does not publish versioned releases, so the image is
-    # pinned to the current linux/amd64 manifest digest for reproducibility.
-    image: ghcr.io/clambin/intel-gpu-exporter@sha256:897295faa176f6388fcee4e35aaa6ab574c65cb837b5f54d732d8018e5499a61
+    # Pin both the upstream release and its linux/amd64 manifest digest.
+    image: ghcr.io/clambin/intel-gpu-exporter:v0.3.1@sha256:897295faa176f6388fcee4e35aaa6ab574c65cb837b5f54d732d8018e5499a61
     container_name: intel-gpu-exporter
     restart: unless-stopped
     command:
+      # v0.3.1 defaults to :9090; keep the monitoring contract explicit.
+      - --addr=:9100
       - --interval=5s
     expose:
       # Metrics stay internal and are scraped only by Prometheus.
