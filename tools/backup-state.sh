@@ -6,7 +6,7 @@ usage() {
   cat <<'EOF'
 Usage: backup-state.sh DESTINATION
 
-Create a timestamped rsync backup of HOMELAB_STATE_DIR inside DESTINATION.
+Create a timestamped archive of HOMELAB_STATE_DIR inside DESTINATION.
 
 Example:
   sudo ./tools/backup-state.sh /mnt/backup/homelab
@@ -18,8 +18,19 @@ if [[ $# -ne 1 ]]; then
   exit 2
 fi
 
-if ! command -v rsync >/dev/null 2>&1; then
-  echo "Error: rsync is not installed." >&2
+for required_command in tar gzip; do
+  if ! command -v "${required_command}" >/dev/null 2>&1; then
+    echo "Error: ${required_command} is not installed." >&2
+    exit 1
+  fi
+done
+
+if command -v sha256sum >/dev/null 2>&1; then
+  checksum_command=(sha256sum)
+elif command -v shasum >/dev/null 2>&1; then
+  checksum_command=(shasum -a 256)
+else
+  echo "Error: sha256sum or shasum is required." >&2
   exit 1
 fi
 
@@ -61,49 +72,66 @@ esac
 
 timestamp="$(date +%Y%m%d-%H%M%S)"
 backup_name="homelab-state-${timestamp}"
-partial_path="${destination_path}/.${backup_name}.partial"
-backup_path="${destination_path}/${backup_name}"
+archive_name="${backup_name}.tar.gz"
+partial_path="${destination_path}/.${archive_name}.partial"
+partial_checksum_path="${partial_path}.sha256"
+backup_path="${destination_path}/${archive_name}"
+checksum_path="${backup_path}.sha256"
 
-if [[ -e "${partial_path}" || -e "${backup_path}" ]]; then
+if [[ -e "${partial_path}" || -e "${partial_checksum_path}" || \
+      -e "${backup_path}" || -e "${checksum_path}" ]]; then
   echo "Error: backup path already exists for timestamp ${timestamp}." >&2
   exit 1
 fi
 
-mkdir -- "${partial_path}"
-
 echo "Backing up: ${source_path}"
 echo "Destination: ${backup_path}"
+echo "Excluded: ${source_path}/prometheus/data"
 echo
 
-rsync_help="$(rsync --help 2>&1)"
-rsync_options=(
-  --archive
-  --hard-links
-  --numeric-ids
-  --exclude=/prometheus/data/
-  --stats
-  -h
+tar_help="$(tar --help 2>&1)"
+tar_options=(
+  --create
+  --file=-
+  --numeric-owner
+  --exclude=./prometheus/data
 )
 
-if grep -q -- '--acls' <<<"${rsync_help}"; then
-  rsync_options+=(--acls)
+if grep -q -- '--acls' <<<"${tar_help}"; then
+  tar_options+=(--acls)
 fi
 
-if grep -q -- '--xattrs' <<<"${rsync_help}"; then
-  rsync_options+=(--xattrs)
-elif grep -q -- '--extended-attributes' <<<"${rsync_help}"; then
-  rsync_options+=(--extended-attributes)
+if grep -q -- '--xattrs' <<<"${tar_help}"; then
+  tar_options+=(--xattrs)
 fi
 
-if grep -q -- '--info' <<<"${rsync_help}"; then
-  rsync_options+=(--info=progress2)
+if grep -q -- '--one-file-system' <<<"${tar_help}"; then
+  tar_options+=(--one-file-system)
+fi
+
+echo "Creating compressed archive"
+if command -v pv >/dev/null 2>&1; then
+  tar "${tar_options[@]}" -C "${source_path}" . \
+    | pv \
+    | gzip --fast > "${partial_path}"
+elif dd --help 2>&1 | grep -q -- 'status='; then
+  tar "${tar_options[@]}" -C "${source_path}" . \
+    | dd bs=1M status=progress \
+    | gzip --fast > "${partial_path}"
 else
-  rsync_options+=(--progress)
+  echo "Progress details are unavailable; install pv for byte and rate output."
+  tar "${tar_options[@]}" -C "${source_path}" . \
+    | gzip --fast > "${partial_path}"
 fi
 
-rsync "${rsync_options[@]}" -- "${source_path}/" "${partial_path}/"
+echo
+echo "Generating SHA-256 checksum"
+checksum="$("${checksum_command[@]}" "${partial_path}" | awk '{print $1}')"
+printf '%s  %s\n' "${checksum}" "${archive_name}" > "${partial_checksum_path}"
 
 mv -- "${partial_path}" "${backup_path}"
+mv -- "${partial_checksum_path}" "${checksum_path}"
 
 echo
 echo "Backup completed: ${backup_path}"
+echo "Checksum: ${checksum_path}"
