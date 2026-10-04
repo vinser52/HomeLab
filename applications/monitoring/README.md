@@ -108,13 +108,15 @@ capabilities are dropped, the container filesystem is read-only, and
 `no-new-privileges` is enabled. The exporter does not use privileged mode, host
 PID visibility, host networking, or the Docker socket.
 
-The image is pinned by immutable linux/amd64 manifest digest because the
-upstream project does not publish versioned releases. Prometheus scrapes the
-exporter at `intel-gpu-exporter:9100`. The `Intel GPU Overview` dashboard shows
-engine busy/wait/semaphore activity, actual and requested frequency, GPU and
-package power where the platform exposes those counters, and integrated memory
-controller bandwidth. Some power or bandwidth series may be absent when the
-hardware or kernel does not expose the corresponding PMU counters.
+The image is pinned to upstream release `v0.3.1` and its immutable linux/amd64
+manifest digest. The exporter samples the GPU every five seconds, and
+Prometheus uses a matching job-specific five-second interval to scrape it at
+`intel-gpu-exporter:9100`. Other jobs retain the global 15-second interval. The
+`Intel GPU Overview` dashboard shows engine busy/wait/semaphore activity,
+actual and requested frequency, GPU and package power where the platform
+exposes those counters, and integrated memory controller bandwidth. Some power
+or bandwidth series may be absent when the hardware or kernel does not expose
+the corresponding PMU counters.
 
 ## Reverse Proxy Metrics
 

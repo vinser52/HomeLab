@@ -19,6 +19,10 @@ scrape_configs:
           - cadvisor:8080
 
   - job_name: intel-gpu-exporter
+    # Match the exporter's five-second sampling interval so short saturation
+    # spikes remain visible without increasing the global scrape frequency.
+    scrape_interval: 5s
+    scrape_timeout: 4s
     static_configs:
       - targets:
           - intel-gpu-exporter:9100
