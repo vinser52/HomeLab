@@ -213,6 +213,7 @@ Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `
 - [Storage Layout](docs/storage-layout.md)
 - [Runtime State Migration](docs/migration-runtime-state.md)
 - [TLS](docs/tls.md)
+- [Tools And State Backup](tools/README.md)
 
 ## Local Configuration
 
