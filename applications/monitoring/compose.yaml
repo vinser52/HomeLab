@@ -37,6 +37,10 @@ services:
     expose:
       # Prometheus stays internal and is used by Grafana over Docker networking.
       - "9090"
+    extra_hosts:
+      # Keep the public host contract usable from Docker even when the host has
+      # multiple upstream DNS servers that do not all serve home.arpa.
+      - "homelab-server.home.arpa:host-gateway"
     volumes:
       - ./config/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - ${HOMELAB_STATE_DIR:-/homelab/state}/prometheus/data:/prometheus

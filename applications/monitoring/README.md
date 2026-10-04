@@ -85,6 +85,12 @@ node-exporter runs in a container but reports Ubuntu host metrics by using host 
 
 The container does not use `privileged: true` or the Docker socket. Host networking is an explicit exception for node-exporter because Linux network counters are network-namespace scoped; without host networking, node-exporter reports the container's `eth0` instead of the Ubuntu host's physical interfaces. Filesystem collector exclusions remove noisy pseudo-filesystems, Docker overlay mounts, Ubuntu Snap mounts, and container runtime paths so dashboard storage metrics focus on real host filesystems.
 
+Prometheus preserves the public `homelab-server.home.arpa` scrape contract with
+an explicit Docker `host-gateway` mapping. This avoids depending on Docker's
+upstream DNS selection when the Ubuntu host has multiple resolvers and only
+Technitium serves the local `home.arpa` zone. No LAN IP is hardcoded in the
+monitoring stack.
+
 ## Container Metrics
 
 cAdvisor reports per-container CPU, memory, network, filesystem usage, and filesystem I/O. It stays internal on the Docker `proxy` network and is scraped by Prometheus at `cadvisor:8080`.
@@ -127,7 +133,7 @@ fritz-exporter v3 listens on `127.0.0.1` by default, so the Compose service expl
 Run Compose validation locally on the MacBook before deployment:
 
 ```bash
-docker compose config
+docker compose config --quiet
 ```
 
 Runtime validation should be run on the Ubuntu HomeLab server after pulling the updated repository:

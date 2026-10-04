@@ -78,6 +78,11 @@ Homepage configuration lives under `applications/homepage/config/` and is commit
 
 Homepage gets live host metrics from Glances over the internal Docker network. Uptime Kuma monitors service availability and response time. Grafana and Prometheus provide historical host, container, gateway, reverse proxy, and DNS metrics.
 
+Prometheus scrapes the host-networked node-exporter through the stable
+`homelab-server.home.arpa` contract. Compose maps that name to Docker's host
+gateway for Prometheus so host metrics do not depend on which upstream DNS
+server Docker selects, and no LAN IP is embedded in the monitoring stack.
+
 Caddy provides LAN-only HTTPS using its internal CA. Browsers will warn until the Caddy root CA is trusted on each client device. See [TLS](docs/tls.md).
 
 ## Quick Start On The Server
@@ -97,7 +102,7 @@ cp .env.example .env
 Edit `.env` for this deployment. Do not commit `.env`; it may contain local settings and secrets.
 
 ```bash
-docker compose config
+docker compose config --quiet
 docker compose up -d
 docker compose ps
 ```

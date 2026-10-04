@@ -17,7 +17,7 @@ Normal flow:
 
 ```bash
 git pull
-docker compose config
+docker compose config --quiet
 docker compose up -d
 docker compose ps
 docker compose logs --tail=100 caddy
@@ -40,7 +40,7 @@ Git is the source of truth for intended configuration. Runtime data and local se
 
 | Command | Purpose |
 | --- | --- |
-| `docker compose config` | Render and validate the full Compose configuration. |
+| `docker compose config --quiet` | Validate the full Compose configuration without printing interpolated secrets. |
 | `docker compose up -d` | Create or update services in the background. |
 | `docker compose ps` | Show service status and published ports. |
 | `docker compose logs --tail=100 <service>` | Show recent logs for one service. |
@@ -137,6 +137,11 @@ Uptime Kuma should be accessed through `https://status.home.arpa`. It does not p
 Jellyfin should be accessed through `https://jellyfin.home.arpa`. It does not publish port `8096` directly to the LAN. Its runtime state lives under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`, while media stays under `${HOMELAB_STORAGE_DIR}/media`.
 
 Grafana should be accessed through `https://grafana.home.arpa`. It does not publish port `3000` directly to the LAN. Prometheus and node-exporter are internal-only services and do not publish ports directly to the LAN. Grafana runtime state lives under `${HOMELAB_STATE_DIR}/grafana/data`; Prometheus metrics data lives under `${HOMELAB_STATE_DIR}/prometheus/data`.
+
+node-exporter uses host networking to observe the Ubuntu host's physical
+interfaces. Prometheus scrapes it through `homelab-server.home.arpa`, with an
+explicit Compose `host-gateway` mapping so the stable hostname works even when
+Docker's upstream DNS servers do not all serve the local `home.arpa` zone.
 
 Monitoring runtime checks should be run on the Ubuntu HomeLab server, not on the MacBook:
 
