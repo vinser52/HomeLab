@@ -19,10 +19,10 @@ jellyfin:8096
 The HomeLab pins the official Jellyfin image to:
 
 ```text
-docker.io/jellyfin/jellyfin:10.11.0
+docker.io/jellyfin/jellyfin:12.1
 ```
 
-As of July 17, 2026, `10.11.0` is the latest stable Jellyfin release. `12.0` is still only available as release candidates and is intentionally not used here.
+As of October 4, 2026, `12.1` is the latest stable Jellyfin release.
 
 ## Required Environment Variables
 
