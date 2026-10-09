@@ -39,6 +39,8 @@ Git is the source of truth for intended configuration. Runtime data and local se
 
 ## Useful Commands
 
+For the initial Prowlarr, Radarr, and Sonarr rollout, use [Media Management Setup](media-management.md). It includes directory preparation, deployment, Caddy activation, authentication, and in-place library import. Download clients and download paths are deferred.
+
 | Command | Purpose |
 | --- | --- |
 | `docker compose config --quiet` | Validate the full Compose configuration without printing interpolated secrets. |

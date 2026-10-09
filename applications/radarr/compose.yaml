@@ -1,0 +1,22 @@
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:6.4.4.10685-ls319
+    container_name: radarr
+    restart: unless-stopped
+    # LinuxServer supports non-root operation; prepare /config ownership first.
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    environment:
+      TZ: ${HOMELAB_TZ:-Europe/Berlin}
+    expose:
+      - "7878"
+    volumes:
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/radarr/config:/config
+      # Library management requires write access. Do not create an empty library
+      # automatically if the server's storage path is configured incorrectly.
+      - type: bind
+        source: ${HOMELAB_STORAGE_DIR:-/homelab/storage}/media/Movies
+        target: /data/media/Movies
+        bind:
+          create_host_path: false
+    networks:
+      - proxy

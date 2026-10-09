@@ -28,6 +28,18 @@
         href: https://jellyfin.home.arpa
         description: Media streaming
         icon: jellyfin.png
+    - Prowlarr:
+        href: https://prowlarr.home.arpa
+        description: Media indexer management
+        icon: prowlarr.png
+    - Radarr:
+        href: https://radarr.home.arpa
+        description: Movie library management
+        icon: radarr.png
+    - Sonarr:
+        href: https://sonarr.home.arpa
+        description: Series library management
+        icon: sonarr.png
 - Utilities:
     - OpenSpeedTest:
         href: https://speedtest.home.arpa

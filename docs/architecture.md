@@ -45,9 +45,14 @@ Current application service:
 | `glances.home.arpa` | Glances | `applications/glances/` |
 | `status.home.arpa` | Uptime Kuma | `applications/uptime-kuma/` |
 | `jellyfin.home.arpa` | Jellyfin | `applications/jellyfin/` |
+| `prowlarr.home.arpa` | Prowlarr | `applications/prowlarr/` |
+| `radarr.home.arpa` | Radarr | `applications/radarr/` |
+| `sonarr.home.arpa` | Sonarr | `applications/sonarr/` |
 | `grafana.home.arpa` | Grafana with Prometheus and node-exporter | `applications/monitoring/` |
 
 ## Contracts Over Implementations
+
+Prowlarr, Radarr, and Sonarr are application services on the shared `proxy` network. Their web interfaces use Caddy's internal HTTPS. Prowlarr communicates with Radarr and Sonarr through Docker HTTP service names. This first phase manages the existing library; indexer selection and a download client are deferred. Radarr has write access only to Movies, Sonarr only to Series, and Prowlarr has no media mount. Jellyfin retains read-only media access. See [Media Management Setup](media-management.md).
 
 The architecture should depend on service contracts rather than specific products. For example, applications need local DNS names to resolve and HTTP requests to route correctly; they should not need to know whether the DNS contract is fulfilled by Technitium, AdGuard Home, or another DNS service.
 

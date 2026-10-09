@@ -45,3 +45,18 @@ jellyfin.home.arpa {
     tls internal
     reverse_proxy jellyfin:8096
 }
+
+prowlarr.home.arpa {
+    tls internal
+    reverse_proxy prowlarr:9696
+}
+
+radarr.home.arpa {
+    tls internal
+    reverse_proxy radarr:7878
+}
+
+sonarr.home.arpa {
+    tls internal
+    reverse_proxy sonarr:8989
+}

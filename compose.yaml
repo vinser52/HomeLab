@@ -6,6 +6,9 @@ include:
   - ./applications/glances/compose.yaml
   - ./applications/uptime-kuma/compose.yaml
   - ./applications/jellyfin/compose.yaml
+  - ./applications/prowlarr/compose.yaml
+  - ./applications/radarr/compose.yaml
+  - ./applications/sonarr/compose.yaml
   - ./applications/monitoring/compose.yaml
 
 networks:

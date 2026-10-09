@@ -2,9 +2,11 @@
 
 This repository is the source of truth for a Docker Compose based HomeLab. It is developed and deployed to a home Ubuntu server via Git, and currently runs infrastructure services for the local network.
 
-The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, Uptime Kuma, Jellyfin, Grafana, Prometheus, node-exporter, cAdvisor, intel-gpu-exporter, fritz-exporter, and technitium-exporter. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, Uptime Kuma tracks service availability, Jellyfin provides local media streaming, and the monitoring stack provides historical host, container, Intel GPU, gateway, reverse proxy, and DNS metrics.
+The configured services are Technitium DNS Server, Caddy, Homepage, OpenSpeedTest, Glances, Uptime Kuma, Jellyfin, Prowlarr, Radarr, Sonarr, Grafana, Prometheus, node-exporter, cAdvisor, intel-gpu-exporter, fritz-exporter, and technitium-exporter. Technitium provides DNS, Caddy is the local HTTP reverse proxy, Homepage is the dashboard, OpenSpeedTest provides LAN speed testing, Glances provides lightweight live host monitoring, Uptime Kuma tracks service availability, Jellyfin provides local media streaming, Prowlarr/Radarr/Sonarr provide media management, and the monitoring stack provides historical host, container, Intel GPU, gateway, reverse proxy, and DNS metrics.
 
 ## Current Environment
+
+Prowlarr, Radarr, and Sonarr provide media indexer, movie, and series management. Their initial setup registers the existing library without a download client. See [Media Management Setup](docs/media-management.md) for server preparation, authentication, and library import.
 
 | Component | Current value | Notes |
 | --- | --- | --- |
@@ -19,6 +21,9 @@ The current runtime services are Technitium DNS Server, Caddy, Homepage, OpenSpe
 | Live monitoring | Glances | Current implementation of `glances.home.arpa`. |
 | Availability monitoring | Uptime Kuma | Current implementation of `status.home.arpa`. |
 | Media streaming | Jellyfin | Current implementation of `jellyfin.home.arpa`. |
+| Media indexer management | Prowlarr | `prowlarr.home.arpa`; initial setup, indexers deferred. |
+| Movie library management | Radarr | `radarr.home.arpa`; existing-library import, downloads deferred. |
+| Series library management | Sonarr | `sonarr.home.arpa`; existing-library import, downloads deferred. |
 | Historical monitoring | Grafana, Prometheus, node-exporter, cAdvisor, intel-gpu-exporter, Caddy metrics, fritz-exporter, technitium-exporter | Current implementation of `grafana.home.arpa` and internal metrics storage. |
 
 ## Repository Structure
@@ -61,6 +66,15 @@ HomeLab/
     |   |-- compose.yaml
     |   |-- README.md
     |   `-- config/
+    |-- prowlarr/
+    |   |-- compose.yaml
+    |   `-- README.md
+    |-- radarr/
+    |   |-- compose.yaml
+    |   `-- README.md
+    |-- sonarr/
+    |   |-- compose.yaml
+    |   `-- README.md
     |-- homepage/
     |   |-- compose.yaml
     |   |-- README.md
@@ -86,6 +100,8 @@ server Docker selects, and no LAN IP is embedded in the monitoring stack.
 Caddy provides LAN-only HTTPS using its internal CA. Browsers will warn until the Caddy root CA is trusted on each client device. See [TLS](docs/tls.md).
 
 ## Quick Start On The Server
+
+Before the first deployment of Prowlarr, Radarr, and Sonarr, follow [Media Management Setup](docs/media-management.md). In particular, set `HOMELAB_STORAGE_DIR` to the actual existing library location and create the new config directories with the configured UID/GID. The media bind mounts intentionally reject missing library directories.
 
 Run these commands on the Ubuntu HomeLab server:
 
@@ -217,6 +233,7 @@ Expected result: `dns.home.arpa`, `homepage.home.arpa`, `speedtest.home.arpa`, `
 - [Operations](docs/operations.md)
 - [Services](docs/services.md)
 - [Storage Layout](docs/storage-layout.md)
+- [Media Management Setup](docs/media-management.md)
 - [Runtime State Migration](docs/migration-runtime-state.md)
 - [TLS](docs/tls.md)
 - [Tools And State Backup](tools/README.md)

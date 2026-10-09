@@ -46,6 +46,9 @@ These paths are host-specific and are configured through `.env`.
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/config`, `${HOMELAB_STATE_DIR}/technitium/logs` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/data` |
 | Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/config`, `${HOMELAB_STATE_DIR}/jellyfin/cache` |
+| Prowlarr | `${HOMELAB_STATE_DIR}/prowlarr/config` |
+| Radarr | `${HOMELAB_STATE_DIR}/radarr/config` |
+| Sonarr | `${HOMELAB_STATE_DIR}/sonarr/config` |
 | Grafana | `${HOMELAB_STATE_DIR}/grafana/data` |
 | Prometheus | `${HOMELAB_STATE_DIR}/prometheus/data` |
 | Homepage | Git-managed YAML in `applications/homepage/config/` |
@@ -64,6 +67,14 @@ volumes:
   - ${HOMELAB_STATE_DIR:-/homelab/state}/jellyfin/cache:/cache
   - ${HOMELAB_STORAGE_DIR:-/homelab/storage}/media:/media:ro
 ```
+
+## Media Management Layout
+
+Radarr mounts `${HOMELAB_STORAGE_DIR}/media/Movies` read-write at `/data/media/Movies`; Sonarr mounts `${HOMELAB_STORAGE_DIR}/media/Series` read-write at `/data/media/Series`. Prowlarr mounts no user storage. The library paths remain stable for later download integration, while the initial mounts limit each application to its own collection.
+
+On the current Ubuntu server, the existing storage root is `/home/vinser52/homelab/storage`, with UID/GID `1000:1000`. Set that absolute path in the local `.env`; preserve the deployment's existing state path independently. Repository defaults remain generic. Missing media bind sources fail rather than being automatically created.
+
+Downloads are deferred. When introduced, they must live separately from library roots. Review the enclosing mounts and filesystem at that time so downloads and media share a common mount for hardlinks and atomic moves. See [Media Management Setup](media-management.md).
 
 ## Rationale
 

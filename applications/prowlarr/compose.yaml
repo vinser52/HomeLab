@@ -1,0 +1,15 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:2.6.5.5623-ls163
+    container_name: prowlarr
+    restart: unless-stopped
+    # LinuxServer supports non-root operation; prepare /config ownership first.
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    environment:
+      TZ: ${HOMELAB_TZ:-Europe/Berlin}
+    expose:
+      - "9696"
+    volumes:
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/prowlarr/config:/config
+    networks:
+      - proxy

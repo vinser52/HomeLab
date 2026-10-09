@@ -11,6 +11,9 @@ Services should use names under `home.arpa`:
 | DNS Web UI | `dns.home.arpa` |
 | Homepage | `homepage.home.arpa` |
 | Jellyfin | `jellyfin.home.arpa` |
+| Prowlarr | `prowlarr.home.arpa` |
+| Radarr | `radarr.home.arpa` |
+| Sonarr | `sonarr.home.arpa` |
 | Immich | `immich.home.arpa` |
 | Grafana | `grafana.home.arpa` |
 | OpenSpeedTest | `speedtest.home.arpa` |
@@ -57,6 +60,9 @@ Current applications:
 | `applications/glances/` | Current implementation of `glances.home.arpa`. |
 | `applications/uptime-kuma/` | Current implementation of `status.home.arpa`. |
 | `applications/jellyfin/` | Current implementation of `jellyfin.home.arpa`. |
+| `applications/prowlarr/` | Indexer management at `prowlarr.home.arpa`. |
+| `applications/radarr/` | Movie library management at `radarr.home.arpa`. |
+| `applications/sonarr/` | Series library management at `sonarr.home.arpa`. |
 | `applications/monitoring/` | Current implementation of `grafana.home.arpa` and historical host metrics. |
 
 ## Runtime Data
@@ -71,6 +77,9 @@ Current state paths:
 | Technitium | `${HOMELAB_STATE_DIR}/technitium/` |
 | Uptime Kuma | `${HOMELAB_STATE_DIR}/uptime-kuma/` |
 | Jellyfin | `${HOMELAB_STATE_DIR}/jellyfin/` |
+| Prowlarr | `${HOMELAB_STATE_DIR}/prowlarr/config` |
+| Radarr | `${HOMELAB_STATE_DIR}/radarr/config` |
+| Sonarr | `${HOMELAB_STATE_DIR}/sonarr/config` |
 | Grafana | `${HOMELAB_STATE_DIR}/grafana/` |
 | Prometheus | `${HOMELAB_STATE_DIR}/prometheus/` |
 
@@ -168,6 +177,14 @@ https://jellyfin.home.arpa
 Caddy routes `jellyfin.home.arpa` to the `jellyfin` Docker service on port `8096`. The Jellyfin container does not publish port `8096` directly to the LAN and is reachable only through Caddy.
 
 Jellyfin stores runtime state under `${HOMELAB_STATE_DIR}/jellyfin/config` and `${HOMELAB_STATE_DIR}/jellyfin/cache`. It mounts media read-only from `${HOMELAB_STORAGE_DIR}/media` so the existing `Movies` and `Series` layout remains the source of truth.
+
+## Media Management
+
+Prowlarr, Radarr, and Sonarr are reachable through Caddy at `https://prowlarr.home.arpa`, `https://radarr.home.arpa`, and `https://sonarr.home.arpa`. Their internal HTTP addresses are `prowlarr:9696`, `radarr:7878`, and `sonarr:8989`; none publish host ports.
+
+Prowlarr manages indexers. Radarr scans and manages `${HOMELAB_STORAGE_DIR}/media/Movies` at `/data/media/Movies`; Sonarr uses `${HOMELAB_STORAGE_DIR}/media/Series` at `/data/media/Series`. Both need write access for library management. Runtime configuration, API keys, and databases live outside Git under the state paths above.
+
+The first phase imports existing media as unmonitored with renaming disabled. Download clients, download folders, and indexer selection are deferred. See [Media Management Setup](media-management.md) for deployment and UI configuration. Homepage has links for all three; authenticated widgets are deferred. Uptime Kuma monitors may be added manually after authentication and routing are verified.
 
 ## Monitoring
 

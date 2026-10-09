@@ -1,0 +1,21 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:4.0.20.3014-ls326
+    container_name: sonarr
+    restart: unless-stopped
+    # LinuxServer supports non-root operation; prepare /config ownership first.
+    user: "${HOMELAB_UID}:${HOMELAB_GID}"
+    environment:
+      TZ: ${HOMELAB_TZ:-Europe/Berlin}
+    expose:
+      - "8989"
+    volumes:
+      - ${HOMELAB_STATE_DIR:-/homelab/state}/sonarr/config:/config
+      # Keep the library path stable when a download client is added later.
+      - type: bind
+        source: ${HOMELAB_STORAGE_DIR:-/homelab/storage}/media/Series
+        target: /data/media/Series
+        bind:
+          create_host_path: false
+    networks:
+      - proxy

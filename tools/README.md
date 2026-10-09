@@ -51,7 +51,7 @@ as exFAT-formatted external disks.
 
 The backup contains the service state under `${HOMELAB_STATE_DIR}`, including
 Technitium configuration, Caddy state and internal PKI, Uptime Kuma data,
-Jellyfin configuration, and Grafana state.
+Jellyfin configuration, Prowlarr/Radarr/Sonarr configuration and databases, and Grafana state.
 
 Prometheus time-series data is deliberately excluded:
 
